@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1019090724528",
+    "firebase_url": "https://ipatient-native.firebaseio.com",
+    "project_id": "ipatient-native",
+    "storage_bucket": "ipatient-native.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019090724528:android:d496bff25c508a21",
+        "android_client_info": {
+          "package_name": "com.ojambrina.ipatient"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019090724528-mpr1i86tgo2mph4bu0436pp1scudhfb2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ojambrina.ipatient",
+            "certificate_hash": "c0f245d0f0df8f042a1c27e86828cb8ff8f5a159"
+          }
+        },
+        {
+          "client_id": "1019090724528-q3rp5knbrmfqf4vm3a0ad2n4mh6b3l4k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPJssjajrWfFhEd-kAls3sb5B7JI6liwM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019090724528-q3rp5knbrmfqf4vm3a0ad2n4mh6b3l4k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

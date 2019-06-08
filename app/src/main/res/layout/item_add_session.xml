@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="4dp"
+    android:weightSum="100">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/image_detail"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:background="@drawable/ic_radio_button_unchecked_black_24dp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_detail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="80"
+        android:hint="Detalle"
+        android:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/layout_highlight"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/image_highlight"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_stars_black_24dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_remove"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/image_remove"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_remove_circle_black_24dp" />
+    </LinearLayout>
+</LinearLayout>
