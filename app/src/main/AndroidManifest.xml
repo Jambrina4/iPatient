@@ -16,6 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".UI.home.ConfigurationActivity"></activity>
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -27,7 +28,7 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
-        <activity android:name=".UI.home.AssistanceActivity" />
+        <activity android:name=".UI.home.assistance.AssistanceActivity" />
         <activity android:name=".UI.clinics.patients.patientDetail.PatientDetailActivity" />
         <activity android:name=".UI.clinics.patients.AddPatient" />
         <activity android:name=".UI.clinics.CreateClinicActivity" />
@@ -50,4 +51,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>

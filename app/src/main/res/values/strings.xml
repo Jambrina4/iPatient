@@ -76,4 +76,5 @@
     <string name="suggestion">Sugerencia</string>
     <string name="report_bug">Reportar problema</string>
     <string name="disconnect">Desconectarse</string>
+    <string name="text_configuration">Configuración</string>
 </resources>

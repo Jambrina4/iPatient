@@ -39,8 +39,8 @@
 
         <ImageView
             android:id="@+id/image_highlight"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:src="@drawable/ic_stars_black_24dp" />
     </LinearLayout>
 
@@ -53,8 +53,8 @@
 
         <ImageView
             android:id="@+id/image_remove"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_remove_circle_black_24dp" />
+            android:layout_width="24dp"
+            android:layout_height="48dp"
+            android:background="@drawable/ic_remove_circle_black_24dp" />
     </LinearLayout>
 </LinearLayout>

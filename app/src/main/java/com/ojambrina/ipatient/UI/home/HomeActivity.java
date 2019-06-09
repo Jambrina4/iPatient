@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
@@ -22,24 +21,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.UI.clinics.CreateClinicActivity;
 import com.ojambrina.ipatient.UI.clinics.patients.AddPatient;
+import com.ojambrina.ipatient.UI.home.assistance.AssistanceActivity;
 import com.ojambrina.ipatient.UI.login.LoginActivity;
 import com.ojambrina.ipatient.adapters.ClinicAdapter;
 import com.ojambrina.ipatient.adapters.PatientAdapter;
@@ -63,10 +58,8 @@ import static com.ojambrina.ipatient.utils.Constants.CLINIC_NAME;
 import static com.ojambrina.ipatient.utils.Constants.LATEST_CLINIC;
 import static com.ojambrina.ipatient.utils.Constants.NO_CLINIC_ADDED;
 import static com.ojambrina.ipatient.utils.Constants.PATIENTS;
-import static com.ojambrina.ipatient.utils.Constants.PROFESSIONAL;
 import static com.ojambrina.ipatient.utils.Constants.PROFESSIONALS;
 import static com.ojambrina.ipatient.utils.Constants.SHARED_PREFERENCES;
-import static com.ojambrina.ipatient.utils.Constants.USER_EMAIL;
 import static com.ojambrina.ipatient.utils.RequestCodes.CREATE_CLINIC_REQUEST_CODE;
 
 public class HomeActivity extends AppCompatActivity {
@@ -88,28 +81,20 @@ public class HomeActivity extends AppCompatActivity {
     TextView textEmail;
     @BindView(R.id.layout_user)
     LinearLayout layoutUser;
-    @BindView(R.id.separator1)
-    View separator1;
     @BindView(R.id.progress_bar_drawer)
     ProgressBar progressBarDrawer;
     @BindView(R.id.recycler_clinic)
     RecyclerView recyclerClinic;
-    @BindView(R.id.separator2)
-    View separator2;
     @BindView(R.id.text_add_clinic)
     TextView textAddClinic;
-    @BindView(R.id.separator3)
-    View separator3;
     @BindView(R.id.text_connect_clinic)
     TextView textConnectClinic;
-    @BindView(R.id.separator4)
-    View separator4;
+    @BindView(R.id.text_configuration)
+    TextView textConfiguration;
+    @BindView(R.id.text_assistance)
+    TextView textAssistance;
     @BindView(R.id.text_logout)
     TextView textLogout;
-    @BindView(R.id.separator5)
-    View separator5;
-    @BindView(R.id.text_assistance)
-    TextView textSettings;
     @BindView(R.id.nav_view)
     NavigationView navView;
     @BindView(R.id.drawer_layout)
@@ -401,19 +386,24 @@ public class HomeActivity extends AppCompatActivity {
             dialog.show();
         });
 
+        textConfiguration.setOnClickListener(v -> {
+            drawerLayout.closeDrawer(Gravity.START);
+            Intent intent = new Intent(context, ConfigurationActivity.class);
+            startActivity(intent);
+        });
+
+        textAssistance.setOnClickListener(v -> {
+            drawerLayout.closeDrawer(Gravity.START);
+            Intent intent = new Intent(context, AssistanceActivity.class);
+            startActivity(intent);
+        });
+
         textLogout.setOnClickListener(v -> {
             drawerLayout.closeDrawer(Gravity.START);
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(context, LoginActivity.class);
             startActivity(intent);
             finish();
-        });
-
-        textSettings.setOnClickListener(v -> {
-            drawerLayout.closeDrawer(Gravity.START);
-            Toast.makeText(context, "Asistencia", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(context, AssistanceActivity.class);
-            startActivity(intent);
         });
     }
 

@@ -1,10 +1,12 @@
-package com.ojambrina.ipatient.UI.home;
+package com.ojambrina.ipatient.UI.home.assistance;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -12,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.utils.Utils;
 
@@ -85,11 +88,26 @@ public class AssistanceActivity extends AppCompatActivity {
                 topic = editTopic.getText().toString().trim();
                 message = editDescription.getText().toString().trim();
 
+                String combinedTopic = "[" + category + "]" + " " + topic;
+
                 if (category.equals(getResources().getString(R.string.category))) {
                     Toast.makeText(context, "Debes seleccionar una categoría", Toast.LENGTH_SHORT).show();
-                }
+                } else {
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("message/rfc822");
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"jambrina4@gmail.com"});
+                    intent.putExtra(Intent.EXTRA_SUBJECT, combinedTopic);
+                    intent.putExtra(Intent.EXTRA_TEXT, message);
+                    try {
+                        startActivity(Intent.createChooser(intent, "Enviar email..."));
 
-                Toast.makeText(context, "Enviado", Toast.LENGTH_SHORT).show();
+                        //TODO cerrar activity cuando haya abierto la app de correo
+
+                        finish();
+                    } catch (android.content.ActivityNotFoundException ex) {
+                        Toast.makeText(context, "No hay aplicaciones de email enviadas.", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         });
 

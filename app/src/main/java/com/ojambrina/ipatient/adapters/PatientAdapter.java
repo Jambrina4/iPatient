@@ -47,15 +47,17 @@ public class PatientAdapter extends RecyclerView.Adapter<PatientAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int i) {
+        //TODO a veces las imágenes se cargan en el paciente que no es
+
         patient = patientList.get(holder.getAdapterPosition());
 
-        holder.textPatient.setText(patient.getName());
+        holder.textPatient.setText(patientList.get(holder.getAdapterPosition()).getName());
 
         if (patientList.get(holder.getAdapterPosition()).getProfileImage() == null) {
             holder.imagePatient.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_person_black_24dp));
         } else {
             Glide.with(context)
-                    .load(patient.getProfileImage())
+                    .load(patientList.get(holder.getAdapterPosition()).getProfileImage())
                     .into(holder.imagePatient);
         }
 
