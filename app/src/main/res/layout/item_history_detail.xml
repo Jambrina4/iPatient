@@ -5,12 +5,28 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingTop="4dp"
-    android:paddingBottom="4dp">
+    android:paddingBottom="4dp"
+    android:weightSum="100">
 
     <TextView
         android:id="@+id/text_detail"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="90"
         android:text="Detalle Historial"
         android:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/layout_remove"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="10"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/image_remove"
+            android:layout_width="24dp"
+            android:layout_height="48dp"
+            android:background="@drawable/ic_remove_circle_black_24dp" />
+    </LinearLayout>
 </LinearLayout>

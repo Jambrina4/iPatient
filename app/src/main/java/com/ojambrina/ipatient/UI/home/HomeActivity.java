@@ -77,8 +77,10 @@ public class HomeActivity extends AppCompatActivity {
     RecyclerView recyclerPatients;
     @BindView(R.id.fab)
     FloatingActionButton fab;
-    @BindView(R.id.text_email)
-    TextView textEmail;
+    @BindView(R.id.text_name)
+    TextView textName;
+    @BindView(R.id.text_surname)
+    TextView textSurname;
     @BindView(R.id.layout_user)
     LinearLayout layoutUser;
     @BindView(R.id.progress_bar_drawer)
@@ -153,13 +155,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setDrawerData() {
-        String fullName = professional.getName() + " " + professional.getSurname();
         if (professional.getImage() != null) {
             Utils.loadGlide(context, professional.getImage(), profileImage);
         } else {
             profileImage.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_person_black_24dp));
         }
-        textEmail.setText(fullName);
+        textName.setText(professional.getName());
+        textSurname.setText(professional.getSurname());
         if (latestClinic.equals(NO_CLINIC_ADDED)) {
             toolbar.setTitle(null);
         } else {

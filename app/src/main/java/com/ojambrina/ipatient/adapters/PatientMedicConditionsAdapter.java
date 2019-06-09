@@ -6,8 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.entities.Patient;
 
@@ -17,16 +19,25 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.ojambrina.ipatient.utils.Constants.CLINICS;
+import static com.ojambrina.ipatient.utils.Constants.PATIENTS;
+
 public class PatientMedicConditionsAdapter extends RecyclerView.Adapter<PatientMedicConditionsAdapter.ViewHolder> {
 
     private Context context;
     private List<String> list = new ArrayList<>();
     private String detail;
     private Patient patient;
+    private FirebaseFirestore firebaseFirestore;
+    private String clinicName;
+    private String patientName;
 
-    public PatientMedicConditionsAdapter(Context context, Patient patient) {
+    public PatientMedicConditionsAdapter(Context context, Patient patient, String clinicName, String patientName, FirebaseFirestore firebaseFirestore) {
         this.context = context;
         this.patient = patient;
+        this.clinicName = clinicName;
+        this.patientName = patientName;
+        this.firebaseFirestore = firebaseFirestore;
         list.clear();
         list.addAll(patient.getMedicConditions());
     }
@@ -43,6 +54,12 @@ public class PatientMedicConditionsAdapter extends RecyclerView.Adapter<PatientM
         detail = list.get(holder.getAdapterPosition());
 
         holder.textDetail.setText(detail);
+
+        holder.layoutRemove.setOnClickListener(v -> {
+            list.remove(holder.getAdapterPosition());
+            patient.setMedicConditions(list);
+            firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient);
+        });
     }
 
     @Override
@@ -54,6 +71,8 @@ public class PatientMedicConditionsAdapter extends RecyclerView.Adapter<PatientM
 
         @BindView(R.id.text_detail)
         TextView textDetail;
+        @BindView(R.id.layout_remove)
+        LinearLayout layoutRemove;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

@@ -149,15 +149,15 @@ public class HistoryFragment extends Fragment {
     }
 
     private void setAdapters() {
-        patientRegularMedicationAdapter = new PatientRegularMedicationAdapter(context, patient);
+        patientRegularMedicationAdapter = new PatientRegularMedicationAdapter(context, patient, clinicName, patientName, firebaseFirestore);
         recyclerMedication.setAdapter(patientRegularMedicationAdapter);
-        patientMedicConditionsAdapter = new PatientMedicConditionsAdapter(context, patient);
+        patientMedicConditionsAdapter = new PatientMedicConditionsAdapter(context, patient, clinicName, patientName, firebaseFirestore);
         recyclerMedicConditions.setAdapter(patientMedicConditionsAdapter);
-        patientRegularExerciseAdapter = new PatientRegularExerciseAdapter(context, patient);
+        patientRegularExerciseAdapter = new PatientRegularExerciseAdapter(context, patient, clinicName, patientName, firebaseFirestore);
         recyclerRegularExercise.setAdapter(patientRegularExerciseAdapter);
-        patientSurgicalOperationsAdapter = new PatientSurgicalOperationsAdapter(context, patient);
+        patientSurgicalOperationsAdapter = new PatientSurgicalOperationsAdapter(context, patient, clinicName, patientName, firebaseFirestore);
         recyclerSurgicalOperations.setAdapter(patientSurgicalOperationsAdapter);
-        patientMedicExaminationAdapter = new PatientMedicExaminationAdapter(context, patient);
+        patientMedicExaminationAdapter = new PatientMedicExaminationAdapter(context, patient, clinicName, patientName, firebaseFirestore);
         recyclerMedicExamination.setAdapter(patientMedicExaminationAdapter);
     }
 

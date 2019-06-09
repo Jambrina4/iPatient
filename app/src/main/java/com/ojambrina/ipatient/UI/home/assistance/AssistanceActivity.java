@@ -84,7 +84,7 @@ public class AssistanceActivity extends AppCompatActivity {
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                category = textCategory.getText().toString();
+                category = textCategory.getText().toString().toUpperCase();
                 topic = editTopic.getText().toString().trim();
                 message = editDescription.getText().toString().trim();
 
@@ -95,7 +95,7 @@ public class AssistanceActivity extends AppCompatActivity {
                 } else {
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("message/rfc822");
-                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"jambrina4@gmail.com"});
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"oscarjambrinaserrano@icloud.com"});
                     intent.putExtra(Intent.EXTRA_SUBJECT, combinedTopic);
                     intent.putExtra(Intent.EXTRA_TEXT, message);
                     try {
