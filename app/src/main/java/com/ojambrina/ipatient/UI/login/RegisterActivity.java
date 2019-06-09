@@ -32,15 +32,20 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.ojambrina.ipatient.BuildConfig;
 import com.ojambrina.ipatient.R;
-import com.ojambrina.ipatient.entities.Proffesional;
+import com.ojambrina.ipatient.entities.Professional;
 import com.ojambrina.ipatient.utils.AppPreferences;
 import com.ojambrina.ipatient.utils.Utils;
 
@@ -92,24 +97,24 @@ public class RegisterActivity extends AppCompatActivity {
     RelativeLayout layoutProfilePhoto;
 
     //Declarations
-    Context context;
-    AppPreferences appPreferences;
-    Proffesional proffesional;
-
-    FirebaseAuth firebaseAuth;
-    FirebaseFirestore firebaseFirestore;
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference databaseReference;
-    String username, name, surname, identityNumber, phone, email, password;
+    private Context context;
+    private AppPreferences appPreferences;
+    private Professional professional;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+    private FirebaseFirestore firebaseFirestore;
+    private FirebaseStorage firebaseStorage;
+    private StorageReference storageReference;
+    private String username, name, surname, identityNumber, phone, email, password;
     boolean isValidName, isValidSurname, isValidIdentityNumber, isValidPhone, isValidEmail, isValidPassword, isValidPasswordRepeat;
-    Dialog dialog;
+    private Dialog dialog;
     private String cameraPath;
     private File profilePath;
     private Uri imageUri;
     private Uri getImageUri;
 
     //TODO: Poner EditTextInputLayout en color blanco
-    //TODO METODO AÑADIR FOTO A PROFESIONAL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,6 +124,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         context = this;
         appPreferences = new AppPreferences();
+        firebaseStorage = FirebaseStorage.getInstance();
 
         setToolbar();
         setFirebase();
@@ -134,59 +140,96 @@ public class RegisterActivity extends AppCompatActivity {
     private void setFirebase() {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("profesionales");
+        databaseReference = firebaseDatabase.getReference(PROFESSIONALS);
         firebaseFirestore = FirebaseFirestore.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
     }
 
     private void listeners() {
-        layoutRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getProffesional();
+        layoutRegister.setOnClickListener(v -> {
+            name = editName.getText().toString().trim();
+            surname = editSurname.getText().toString().trim();
+            identityNumber = editIdentityNumber.getText().toString().trim();
+            phone = editPhone.getText().toString().trim();
+            email = editEmail.getText().toString().trim();
 
-                validatePasswordRepeat(editPasswordRepeat);
-                validatePassword(editPassword);
-                validatePhone(editPhone);
-                validateEmail(editEmail);
-                validateIdentityNumber(editIdentityNumber);
-                validateSurname(editSurname);
-                validateName(editName);
+            username = name + " " + surname;
 
-                if (isValidName && isValidSurname && isValidIdentityNumber && isValidEmail && isValidPhone && isValidPassword && isValidPasswordRepeat) {
-                    dialog = Utils.showProgressDialog(context, "Creando usuario");
-                    dialog.show();
+            validatePasswordRepeat(editPasswordRepeat);
+            validatePassword(editPassword);
+            validatePhone(editPhone);
+            validateEmail(editEmail);
+            validateIdentityNumber(editIdentityNumber);
+            validateSurname(editSurname);
+            validateName(editName);
 
-                    firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
+            if (isValidName && isValidSurname && isValidIdentityNumber && isValidEmail && isValidPhone && isValidPassword && isValidPasswordRepeat) {
+                dialog = Utils.showProgressDialog(context, "Creando usuario");
+                dialog.show();
+
+                if (imageUri != null) {
+                    StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
+                    sr.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
+                        Task<Uri> uri = sr.getDownloadUrl();
+                        do {
+                            Log.d("INFO", "SUBIENDO IMAGEN DE USUARIO");
+                        } while (!uri.isComplete());
+                        getImageUri = uri.getResult();
+
+                        setProfessional();
+
+                        firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, task -> {
                             if (task.isSuccessful()) {
+                                firebaseFirestore.collection(PROFESSIONALS).document(username).set(professional).addOnSuccessListener(aVoid -> {
+                                    dialog.dismiss();
+                                    appPreferences.setEmail(email);
+
+                                    Log.d("REGISTRO", "createUserWithEmail:onComplete:" + task.isSuccessful());
+                                    FirebaseAuth.getInstance().signOut();
+
+                                    Intent intent = new Intent(context, LoginActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                });
+                            } else {
+                                dialog.dismiss();
+                                Toast.makeText(context, "Refistro fallido." + task.getException(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }).addOnFailureListener(e -> {
+                        dialog.dismiss();
+                        Toast.makeText(context, "Ha ocurrido un problema al agregar el usuario, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", e.getMessage());
+                    });
+                } else {
+                    setProfessional();
+
+                    firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, task -> {
+                        if (task.isSuccessful()) {
+                            firebaseFirestore.collection(PROFESSIONALS).document(username).set(professional).addOnSuccessListener(aVoid -> {
                                 dialog.dismiss();
                                 appPreferences.setEmail(email);
 
                                 Log.d("REGISTRO", "createUserWithEmail:onComplete:" + task.isSuccessful());
-                                firebaseFirestore.collection(PROFESSIONALS).document(username).set(proffesional);
                                 FirebaseAuth.getInstance().signOut();
 
                                 Intent intent = new Intent(context, LoginActivity.class);
                                 startActivity(intent);
                                 finish();
-                            } else {
-                                dialog.dismiss();
-                                Toast.makeText(context, "Refistro fallido." + task.getException(), Toast.LENGTH_SHORT).show();
-                            }
+                            });
+                        } else {
+                            dialog.dismiss();
+                            Toast.makeText(context, "Refistro fallido." + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
             }
         });
 
-        haveAccount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(context, LoginActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        haveAccount.setOnClickListener(v -> {
+            Intent intent = new Intent(context, LoginActivity.class);
+            startActivity(intent);
+            finish();
         });
 
         toolbar.setNavigationOnClickListener(v -> {
@@ -194,25 +237,21 @@ public class RegisterActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         });
+
+        layoutProfilePhoto.setOnClickListener(v -> showPictureDialog());
     }
 
-    private void getProffesional() {
-        proffesional = new Proffesional();
+    private void setProfessional() {
+        professional = new Professional();
 
-        name = editName.getText().toString().trim();
-        surname = editSurname.getText().toString().trim();
-        identityNumber = editIdentityNumber.getText().toString().trim();
-        phone = editPhone.getText().toString().trim();
-        email = editEmail.getText().toString().trim();
-
-        username = name + " " + surname;
-
-        proffesional.setName(name);
-        proffesional.setSurname(surname);
-        proffesional.setIdentityNumber(identityNumber);
-        proffesional.setPhone(phone);
-        proffesional.setEmail(email);
-        //aproffesional.setImage(image);
+        professional.setName(name);
+        professional.setSurname(surname);
+        professional.setIdentityNumber(identityNumber);
+        professional.setPhone(phone);
+        professional.setEmail(email);
+        if (imageUri != null) {
+            professional.setImage(String.valueOf(getImageUri));
+        }
     }
 
     private void showPictureDialog() {
@@ -221,20 +260,16 @@ public class RegisterActivity extends AppCompatActivity {
         String[] pictureDialogItems = {
                 "Seleccionar foto desde galería",
                 "Capturar foto desde camara"};
-        pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                choosePhotoFromGallery();
-                                break;
-                            case 1:
-                                takePhotoFromCamera();
-                                break;
-                        }
-                    }
-                });
+        pictureDialog.setItems(pictureDialogItems, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    choosePhotoFromGallery();
+                    break;
+                case 1:
+                    takePhotoFromCamera();
+                    break;
+            }
+        });
         pictureDialog.show();
     }
 
@@ -270,7 +305,7 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == -1) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case IMAGE_FROM_GALLERY:
                     if (data != null) {

@@ -23,6 +23,7 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_image"
                 android:layout_width="64dp"
                 android:layout_height="64dp" />
 
@@ -31,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_gravity="center"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 android:text="@string/nav_header_subtitle"
                 android:textColor="@android:color/black" />
         </LinearLayout>
@@ -127,7 +128,7 @@
             android:layout_height="wrap_content"
             android:layout_above="@id/separator5"
             android:padding="16dp"
-            android:text="Desconectarse" />
+            android:text="@string/disconnect" />
 
         <View
             android:id="@+id/separator5"

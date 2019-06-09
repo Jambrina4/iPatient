@@ -2,6 +2,8 @@ package com.ojambrina.ipatient.UI.clinics.patients;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -116,6 +118,7 @@ public class AddPatient extends AppCompatActivity {
     private File profilePath;
     private Uri imageUri;
     private Uri getImageUri;
+    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,125 +137,104 @@ public class AddPatient extends AppCompatActivity {
     }
 
     private void listeners() {
-        layoutProfilePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showPictureDialog();
-            }
+        layoutProfilePhoto.setOnClickListener(v -> showPictureDialog());
+
+        layoutBackgroundDeletePhoto.setOnClickListener(v -> {
+            profilePhoto.setImageDrawable(null);
+            imageCameraProfile.setVisibility(View.VISIBLE);
+            layoutBackgroundDeletePhoto.setVisibility(View.GONE);
         });
 
-        layoutBackgroundDeletePhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                profilePhoto.setImageDrawable(null);
-                imageCameraProfile.setVisibility(View.VISIBLE);
-                layoutBackgroundDeletePhoto.setVisibility(View.GONE);
-            }
-        });
+        editPatientBornDate.setOnClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
 
-        editPatientBornDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Calendar calendar = Calendar.getInstance();
-
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                int month = calendar.get(Calendar.MONTH);
-                int year = calendar.get(Calendar.YEAR);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                        month = month + 1;
-                        String date = dayOfMonth + "-" + month + "-" + year;
-                        editPatientBornDate.setText(date);
-                    }
-                }, year, month, day);
-                datePickerDialog.show();
-            }
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH);
+            int year = calendar.get(Calendar.YEAR);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(context, (view, year1, month1, dayOfMonth) -> {
+                month1 = month1 + 1;
+                String date = dayOfMonth + "-" + month1 + "-" + year1;
+                editPatientBornDate.setText(date);
+            }, year, month, day);
+            datePickerDialog.show();
         });
 
 
-        buttonAddPatient.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                name = editPatientName.getText().toString().trim();
-                surname = editPatientSurname.getText().toString().trim();
-                bornDate = editPatientBornDate.getText().toString().trim();
-                phone = editPatientPhone.getText().toString().trim();
-                email = editPatientEmail.getText().toString().trim();
-                profession = editPatientProfession.getText().toString().trim();
+        buttonAddPatient.setOnClickListener(v -> {
+            name = editPatientName.getText().toString().trim();
+            surname = editPatientSurname.getText().toString().trim();
+            bornDate = editPatientBornDate.getText().toString().trim();
+            phone = editPatientPhone.getText().toString().trim();
+            email = editPatientEmail.getText().toString().trim();
+            profession = editPatientProfession.getText().toString().trim();
 
-                validateProfession(editPatientProfession);
-                validateEmail(editPatientEmail);
-                validatePhone(editPatientPhone);
-                validateBornDate(editPatientBornDate);
-                validateSurname(editPatientSurname);
-                validateName(editPatientName);
+            validateProfession(editPatientProfession);
+            validateEmail(editPatientEmail);
+            validatePhone(editPatientPhone);
+            validateBornDate(editPatientBornDate);
+            validateSurname(editPatientSurname);
+            validateName(editPatientName);
 
-                if (isValidPatientName && isValidPatientSurname && isValidPatientBornDate && isValidPatientPhone && isValidPatientEmail && isValidPatientProfession) {
+            if (isValidPatientName && isValidPatientSurname && isValidPatientBornDate && isValidPatientPhone && isValidPatientEmail && isValidPatientProfession) {
+                dialog = Utils.showProgressDialog(context, "Añadiendo paciente");
+                dialog.show();
 
-                    if (clinic_name.equals(NO_CLINIC_ADDED)) {
-                        Toast.makeText(context, "Debes registrar una clínica para poder agregar un paciente", Toast.LENGTH_SHORT).show();
+                if (clinic_name.equals(NO_CLINIC_ADDED)) {
+                    dialog.dismiss();
+                    Toast.makeText(context, "Debes registrar una clínica para poder agregar un paciente", Toast.LENGTH_SHORT).show();
+                } else {
+                    if (imageUri != null) {
+                        StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
+                        sr.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
+                            Task<Uri> uri = sr.getDownloadUrl();
+                            do {
+                                Log.d("INFO", "SUBIENDO IMAGEN DE PACIENTE");
+                            } while (!uri.isComplete());
+                            getImageUri = uri.getResult();
+
+                            firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).get().addOnCompleteListener(task -> {
+                                if (task.getResult().exists()) {
+                                    dialog.dismiss();
+                                    Toast.makeText(context, "Ya existe un paciente con ese nombre", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    dialog.dismiss();
+                                    addPatient();
+                                    firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).set(patient);
+                                    finish();
+                                }
+                            });
+                        }).addOnFailureListener(e -> {
+                            dialog.dismiss();
+                            Toast.makeText(context, "Ha ocurrido un problema al agregar el paciente, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
+                            Log.d("TAG", e.getMessage());
+                        });
                     } else {
-                        if (imageUri != null) {
-                            StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
-                            sr.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    Task<Uri> uri = sr.getDownloadUrl();
-                                    if (uri.isComplete()) {
-                                        getImageUri = uri.getResult();
-
-                                        firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                                if (task.getResult().exists()) {
-                                                    Toast.makeText(context, "Ya existe un paciente con ese nombre", Toast.LENGTH_SHORT).show();
-                                                } else {
-                                                    addPatient();
-                                                    firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).set(patient);
-                                                    finish();
-                                                }
-                                            }
-                                        });
-                                    }
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(context, "Ha ocurrido un problema al agregar el paciente, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
-                                    Log.d("TAG", e.getMessage());
-                                }
-                            });
-                        } else {
-                            firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                    if (task.getResult().exists()) {
-                                        Toast.makeText(context, "Ya existe un paciente con ese nombre", Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        addPatient();
-                                        firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).set(patient);
-                                        finish();
-                                    }
-                                }
-                            });
-                        }
+                        firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).get().addOnCompleteListener(task -> {
+                            if (task.getResult().exists()) {
+                                dialog.dismiss();
+                                Toast.makeText(context, "Ya existe un paciente con ese nombre", Toast.LENGTH_SHORT).show();
+                            } else {
+                                addPatient();
+                                firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).set(patient);
+                                dialog.dismiss();
+                                finish();
+                            }
+                        }).addOnFailureListener(e -> {
+                            dialog.dismiss();
+                            Toast.makeText(context, "Ha ocurrido un problema al agregar el paciente, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
+                            Log.d("TAG", e.getMessage());
+                        });
                     }
                 }
             }
         });
 
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
 
     private void setFirebase() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("clinicas");
+        databaseReference = firebaseDatabase.getReference(CLINICS);
         firebaseFirestore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
     }
@@ -291,20 +273,16 @@ public class AddPatient extends AppCompatActivity {
         String[] pictureDialogItems = {
                 "Seleccionar foto desde galería",
                 "Capturar foto desde camara"};
-        pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                choosePhotoFromGallery();
-                                break;
-                            case 1:
-                                takePhotoFromCamera();
-                                break;
-                        }
-                    }
-                });
+        pictureDialog.setItems(pictureDialogItems, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    choosePhotoFromGallery();
+                    break;
+                case 1:
+                    takePhotoFromCamera();
+                    break;
+            }
+        });
         pictureDialog.show();
     }
 
@@ -340,7 +318,7 @@ public class AddPatient extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == -1) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case IMAGE_FROM_GALLERY:
                     if (data != null) {

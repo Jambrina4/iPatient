@@ -48,7 +48,6 @@ public class PatientDetailActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseFirestore firebaseFirestore;
     private String clinic_name;
-    private Patient patient;
     private ViewPagerAdapter viewPagerAdapter;
 
     @Override
@@ -64,25 +63,10 @@ public class PatientDetailActivity extends AppCompatActivity {
         contextForToolbar = this;
         context = this;
 
-        setFirebase();
-        getPatientData();
         setToolbar();
+        setFirebase();
+        setAdapter();
         listeners();
-    }
-
-    private void getPatientData() {
-        firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(patientName).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("ERROR", "Listen failed.", e);
-                    return;
-                }
-
-                patient = documentSnapshot.toObject(Patient.class);
-                setAdapter();
-            }
-        });
     }
 
     private void setToolbar() {
@@ -92,12 +76,12 @@ public class PatientDetailActivity extends AppCompatActivity {
 
     private void setFirebase() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("clinicas");
+        databaseReference = firebaseDatabase.getReference(CLINICS);
         firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
     private void setAdapter() {
-        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), context, patient, clinic_name, patientName, firebaseFirestore);
+        viewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager(), context, clinic_name, patientName, firebaseFirestore);
         tabLayout.setupWithViewPager(pager);
         tabLayout.setSelectedTabIndicatorColor(ContextCompat.getColor(context, android.R.color.black));
         pager.setAdapter(viewPagerAdapter);

@@ -73,7 +73,7 @@ public class FisioFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fisio, container, false);
         unbinder = ButterKnife.bind(this, view);
@@ -100,20 +100,17 @@ public class FisioFragment extends Fragment {
     }
 
     private void listeners() {
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(patientName).collection(SESSION_LIST).document(Utils.getCurrentDay()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (!task.getResult().exists()) {
-                            addSession();
-                            firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(patientName).collection(SESSION_LIST).document(Utils.getCurrentDay()).set(session);
-                        }
+        fab.setOnClickListener(v -> {
+            firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(patientName).collection(SESSION_LIST).document(Utils.getCurrentDay()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (!task.getResult().exists()) {
+                        addSession();
+                        firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(patientName).collection(SESSION_LIST).document(Utils.getCurrentDay()).set(session);
                     }
-                });
-                sessionAdapter.notifyDataSetChanged();
-            }
+                }
+            });
+            sessionAdapter.notifyDataSetChanged();
         });
     }
 
@@ -154,7 +151,7 @@ public class FisioFragment extends Fragment {
 
     private void setFirebase() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("clinicas");
+        databaseReference = firebaseDatabase.getReference(CLINICS);
         firebaseFirestore = FirebaseFirestore.getInstance();
     }
 

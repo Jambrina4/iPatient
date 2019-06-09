@@ -13,18 +13,21 @@ import android.widget.TextView;
 
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.entities.Clinic;
+import com.ojambrina.ipatient.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.ojambrina.ipatient.utils.Constants.LATEST_CLINIC;
 
 public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder> {
 
     private Context context;
-    private List<Clinic> clinicList;
+    private List<Clinic> clinicList = new ArrayList<>();
     private Clinic clinic;
     private String clinicName;
     private OnClickListener listener;
@@ -32,7 +35,7 @@ public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder
 
     public ClinicAdapter(Context context, List<Clinic> clinicList, SharedPreferences sharedPreferences, OnClickListener listener) {
         this.context = context;
-        this.clinicList = clinicList;
+        this.clinicList.addAll(clinicList);
         this.sharedPreferences = sharedPreferences;
         this.listener = listener;
     }
@@ -46,11 +49,15 @@ public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder holder, int i) {
-
-        //TODO RECOGER IMAGEN DE CLÍNICA PARA PINTARLA
-
         clinic = clinicList.get(holder.getAdapterPosition());
         clinicName = clinic.getName();
+
+        if (clinic.getImage() != null) {
+            Utils.loadGlide(context, clinicList.get(holder.getAdapterPosition()).getImage(), holder.imageClinic);
+        } else {
+            holder.imageClinic.setBackground(ContextCompat.getDrawable(context, R.drawable.ic_building_24dp));
+        }
+
         holder.textClinic.setText(clinicName);
         holder.layoutClinic.setBackgroundResource(0);
         if (sharedPreferences.getString(LATEST_CLINIC, "").equals(clinicName)) {
@@ -58,13 +65,10 @@ public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder
         } else {
             holder.layoutClinic.setBackgroundResource(0);
         }
-        holder.layoutClinic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                holder.layoutClinic.setBackground(ContextCompat.getDrawable(context, R.drawable.grey_background));
+        holder.layoutClinic.setOnClickListener(v -> {
+            holder.layoutClinic.setBackground(ContextCompat.getDrawable(context, R.drawable.grey_background));
 
-                listener.onClick(holder.getAdapterPosition(), clinic);
-            }
+            listener.onClick(holder.getAdapterPosition(), clinic);
         });
     }
 
@@ -79,6 +83,8 @@ public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder
         TextView textClinic;
         @BindView(R.id.layout_clinic)
         LinearLayout layoutClinic;
+        @BindView(R.id.image_clinic)
+        CircleImageView imageClinic;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,9 +96,9 @@ public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder
         void onClick(int position, Clinic clinic);
     }
 
-    //public void setData(List<Clinic> list) {
-    //    clinicList.clear();
-    //    clinicList.addAll(list);
-    //    notifyDataSetChanged();
-    //}
+    public void setData(List<Clinic> list) {
+        clinicList.clear();
+        clinicList.addAll(list);
+        notifyDataSetChanged();
+    }
 }

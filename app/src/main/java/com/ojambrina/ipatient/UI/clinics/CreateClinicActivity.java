@@ -1,6 +1,7 @@
 package com.ojambrina.ipatient.UI.clinics;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -19,6 +20,7 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -30,12 +32,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.ojambrina.ipatient.BuildConfig;
@@ -92,22 +99,22 @@ public class CreateClinicActivity extends AppCompatActivity {
     RelativeLayout layoutProfilePhoto;
 
     //Declarations
-    Context context;
-    Clinic clinic;
-    FirebaseAuth firebaseAuth;
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference databaseReference;
-    FirebaseFirestore firebaseFirestore;
-    String name, password, direction, clinicIdentityNumber, description;
-    boolean isValidClinicName, isValidClinicPassword;
-    SharedPreferences sharedPreferences;
-    List<Clinic> clinicList = new ArrayList<>();
+    private Context context;
+    private Clinic clinic;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseDatabase firebaseDatabase;
+    private DatabaseReference databaseReference;
+    private FirebaseFirestore firebaseFirestore;
+    private StorageReference storageReference;
+    private String name, password, direction, clinicIdentityNumber, description;
+    private boolean isValidClinicName, isValidClinicPassword;
+    private SharedPreferences sharedPreferences;
+    private List<Clinic> clinicList = new ArrayList<>();
     private String cameraPath;
     private File profilePath;
     private Uri imageUri;
     private Uri getImageUri;
-
-    //TODO METODO PARA AÑADIR FOTO A LA CLÍNICA
+    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,19 +132,28 @@ public class CreateClinicActivity extends AppCompatActivity {
     }
 
     private void listeners() {
-        buttonClinicRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getStrings();
+        buttonClinicRegister.setOnClickListener(v -> {
+            getStrings();
 
-                validateClinicPassword(editClinicPassword);
-                validateClinicName(editClinicName);
+            validateClinicPassword(editClinicPassword);
+            validateClinicName(editClinicName);
 
-                if (isValidClinicName && isValidClinicPassword) {
-                    firebaseFirestore.collection(CLINICS).document(name).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+            if (isValidClinicName && isValidClinicPassword) {
+                dialog = Utils.showProgressDialog(context, "Creando clínica");
+                dialog.show();
+
+                if (imageUri != null) {
+                    StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
+                    sr.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
+                        Task<Uri> uri = sr.getDownloadUrl();
+                        do {
+                            Log.d("INFO", "SUBIENDO IMAGEN DE CLÍNICA");
+                        } while (!uri.isComplete());
+                        getImageUri = uri.getResult();
+
+                        firebaseFirestore.collection(CLINICS).document(name).get().addOnCompleteListener(task -> {
                             if (task.getResult().exists()) {
+                                dialog.dismiss();
                                 Toast.makeText(context, "Ya existe una clínica con ese nombre", Toast.LENGTH_SHORT).show();
                             } else {
                                 addClinic();
@@ -170,6 +186,7 @@ public class CreateClinicActivity extends AppCompatActivity {
                                 }
 
                                 firebaseFirestore.collection(CLINICS).document(name).set(clinic);
+                                dialog.dismiss();
                                 Toast.makeText(context, "Clínica agregada correctamente", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(context, HomeActivity.class);
                                 intent.putExtra(CLINIC_NAME, clinic.getName());
@@ -177,11 +194,62 @@ public class CreateClinicActivity extends AppCompatActivity {
                                 startActivity(intent);
                                 finish();
                             }
+                        });
+                    }).addOnFailureListener(e -> {
+                        dialog.dismiss();
+                        Toast.makeText(context, "Ha ocurrido un problema al agregar el usuario, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", e.getMessage());
+                    });
+                } else {
+                    firebaseFirestore.collection(CLINICS).document(name).get().addOnCompleteListener(task -> {
+                        if (task.getResult().exists()) {
+                            dialog.dismiss();
+                            Toast.makeText(context, "Ya existe una clínica con ese nombre", Toast.LENGTH_SHORT).show();
+                        } else {
+                            addClinic();
+                            if (sharedPreferences.getString(CLINIC_LIST, "").isEmpty()) {
+                                clinicList.clear();
+                                Gson gson = new Gson();
+                                clinicList.add(clinic);
+                                String listOfClinics = gson.toJson(clinicList);
+
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(CLINIC_LIST, listOfClinics);
+                                editor.putString(LATEST_CLINIC, clinic.getName());
+                                editor.apply();
+                            } else {
+                                clinicList.clear();
+                                Gson gson = new Gson();
+                                String json = sharedPreferences.getString(CLINIC_LIST, "");
+
+                                Type type = new TypeToken<List<Clinic>>() {
+                                }.getType();
+                                List<Clinic> clinicList = gson.fromJson(json, type);
+
+                                clinicList.add(clinic);
+                                String listOfClinics = gson.toJson(clinicList);
+
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(CLINIC_LIST, listOfClinics);
+                                editor.putString(LATEST_CLINIC, clinic.getName());
+                                editor.apply();
+                            }
+
+                            firebaseFirestore.collection(CLINICS).document(name).set(clinic);
+                            dialog.dismiss();
+                            Toast.makeText(context, "Clínica agregada correctamente", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(context, HomeActivity.class);
+                            intent.putExtra(CLINIC_NAME, clinic.getName());
+                            intent.putExtra(CLINIC, clinic);
+                            startActivity(intent);
+                            finish();
                         }
                     });
                 }
             }
         });
+
+        layoutProfilePhoto.setOnClickListener(v -> showPictureDialog());
 
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
     }
@@ -208,13 +276,17 @@ public class CreateClinicActivity extends AppCompatActivity {
         clinic.setDirection(direction);
         clinic.setIdentityNumber(clinicIdentityNumber);
         clinic.setDescription(description);
+        if (imageUri != null) {
+            clinic.setImage(String.valueOf(getImageUri));
+        }
     }
 
     private void setFirebase() {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("clinicas");
+        databaseReference = firebaseDatabase.getReference(CLINICS);
         firebaseFirestore = FirebaseFirestore.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
     }
 
     private void showPictureDialog() {
@@ -223,20 +295,16 @@ public class CreateClinicActivity extends AppCompatActivity {
         String[] pictureDialogItems = {
                 "Seleccionar foto desde galería",
                 "Capturar foto desde camara"};
-        pictureDialog.setItems(pictureDialogItems,
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                choosePhotoFromGallery();
-                                break;
-                            case 1:
-                                takePhotoFromCamera();
-                                break;
-                        }
-                    }
-                });
+        pictureDialog.setItems(pictureDialogItems, (dialog, which) -> {
+            switch (which) {
+                case 0:
+                    choosePhotoFromGallery();
+                    break;
+                case 1:
+                    takePhotoFromCamera();
+                    break;
+            }
+        });
         pictureDialog.show();
     }
 
@@ -272,7 +340,7 @@ public class CreateClinicActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == -1) {
+        if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case IMAGE_FROM_GALLERY:
                     if (data != null) {

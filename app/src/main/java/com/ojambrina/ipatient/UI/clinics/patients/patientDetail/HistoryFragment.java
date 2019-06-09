@@ -110,7 +110,7 @@ public class HistoryFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history, container, false);
         unbinder = ButterKnife.bind(this, view);
@@ -124,27 +124,27 @@ public class HistoryFragment extends Fragment {
         context = getContext();
 
         setFirebase();
-        setAdapters();
         getPatientData();
-        printData();
         listeners();
-
-        //TODO Cuando añado un dato nuevo desaparece la información de los demás recyclerviews
 
         return view;
     }
 
-    private void getPatientData() {
-        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("ERROR", "Listen failed.", e);
-                    return;
-                }
+    //TODO Revisar metodo de recogida de datos de paciente
 
-                patient = documentSnapshot.toObject(Patient.class);
+    private void getPatientData() {
+        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).addSnapshotListener((documentSnapshot, e) -> {
+            if (e != null) {
+                Log.w("ERROR", "Listen failed.", e);
+                return;
             }
+            patient = documentSnapshot.toObject(Patient.class);
+
+            while (patient == null) {
+                Log.d("INFO", "CARGANDO DATOS DEL USUARIO");
+            }
+            setAdapters();
+            printData();
         });
     }
 
@@ -162,45 +162,20 @@ public class HistoryFragment extends Fragment {
     }
 
     private void listeners() {
-        imageAddMedication.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(0);
-            }
-        });
+        imageAddMedication.setOnClickListener(v -> showDialog(0));
 
-        imageAddMedicCondition.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(1);
-            }
-        });
+        imageAddMedicCondition.setOnClickListener(v -> showDialog(1));
 
-        imageAddExercise.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(2);
-            }
-        });
+        imageAddExercise.setOnClickListener(v -> showDialog(2));
 
-        imageAddSurgicalOperation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(3);
-            }
-        });
+        imageAddSurgicalOperation.setOnClickListener(v -> showDialog(3));
 
-        imageAddMedicExamination.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(4);
-            }
-        });
+        imageAddMedicExamination.setOnClickListener(v -> showDialog(4));
     }
 
     private void setFirebase() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("clinicas");
+        databaseReference = firebaseDatabase.getReference(CLINICS);
         firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
@@ -235,106 +210,67 @@ public class HistoryFragment extends Fragment {
         switch (position) {
             case 0:
                 dialogBuilder.setTitle("Añadir medicación habitual");
-                dialogBuilder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if (editItem.getText().toString().trim().length() != 0) {
-                            regularMedication.clear();
-                            regularMedication.addAll(patient.getRegularMedication());
-                            regularMedication.add(editItem.getText().toString().trim());
-                            patient.setRegularMedication(regularMedication);
-                            firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    patientRegularMedicationAdapter.setData(patient);
-                                }
-                            });
-                        }
+                dialogBuilder.setPositiveButton("Aceptar", (dialog, whichButton) -> {
+                    if (editItem.getText().toString().trim().length() != 0) {
+                        regularMedication.clear();
+                        regularMedication.addAll(patient.getRegularMedication());
+                        regularMedication.add(editItem.getText().toString().trim());
+                        patient.setRegularMedication(regularMedication);
+                        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(task -> patientRegularMedicationAdapter.setData(patient));
                     }
                 });
                 break;
             case 1:
                 dialogBuilder.setTitle("Añadir afección médica");
-                dialogBuilder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if (editItem.getText().toString().trim().length() != 0) {
-                            medicConditions.clear();
-                            medicConditions.addAll(patient.getMedicConditions());
-                            medicConditions.add(editItem.getText().toString().trim());
-                            patient.setMedicConditions(medicConditions);
-                            firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    patientMedicConditionsAdapter.setData(patient);
-                                }
-                            });
-                        }
+                dialogBuilder.setPositiveButton("Aceptar", (dialog, whichButton) -> {
+                    if (editItem.getText().toString().trim().length() != 0) {
+                        medicConditions.clear();
+                        medicConditions.addAll(patient.getMedicConditions());
+                        medicConditions.add(editItem.getText().toString().trim());
+                        patient.setMedicConditions(medicConditions);
+                        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(task -> patientMedicConditionsAdapter.setData(patient));
                     }
                 });
                 break;
             case 2:
                 dialogBuilder.setTitle("Añadir ejercicio habitual");
-                dialogBuilder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if (editItem.getText().toString().trim().length() != 0) {
-                            regularExercise.clear();
-                            regularExercise.addAll(patient.getRegularExercise());
-                            regularExercise.add(editItem.getText().toString().trim());
-                            patient.setRegularExercise(regularExercise);
-                            firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    patientRegularExerciseAdapter.setData(patient);
-                                }
-                            });
-                        }
+                dialogBuilder.setPositiveButton("Aceptar", (dialog, whichButton) -> {
+                    if (editItem.getText().toString().trim().length() != 0) {
+                        regularExercise.clear();
+                        regularExercise.addAll(patient.getRegularExercise());
+                        regularExercise.add(editItem.getText().toString().trim());
+                        patient.setRegularExercise(regularExercise);
+                        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(task -> patientRegularExerciseAdapter.setData(patient));
                     }
                 });
                 break;
             case 3:
                 dialogBuilder.setTitle("Añadir operación quirúrjica");
-                dialogBuilder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if (editItem.getText().toString().trim().length() != 0) {
-                            surgicalOperations.clear();
-                            surgicalOperations.addAll(patient.getSurgicalOperations());
-                            surgicalOperations.add(editItem.getText().toString().trim());
-                            patient.setSurgicalOperations(surgicalOperations);
-                            firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    patientSurgicalOperationsAdapter.setData(patient);
-                                }
-                            });
-                        }
+                dialogBuilder.setPositiveButton("Aceptar", (dialog, whichButton) -> {
+                    if (editItem.getText().toString().trim().length() != 0) {
+                        surgicalOperations.clear();
+                        surgicalOperations.addAll(patient.getSurgicalOperations());
+                        surgicalOperations.add(editItem.getText().toString().trim());
+                        patient.setSurgicalOperations(surgicalOperations);
+                        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(task -> patientSurgicalOperationsAdapter.setData(patient));
                     }
                 });
                 break;
             case 4:
                 dialogBuilder.setTitle("Añadir reconocimiento médico");
-                dialogBuilder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        if (editItem.getText().toString().trim().length() != 0) {
-                            medicExamination.clear();
-                            medicExamination.addAll(patient.getMedicExamination());
-                            medicExamination.add(editItem.getText().toString().trim());
-                            patient.setMedicExamination(medicExamination);
-                            firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    patientMedicExaminationAdapter.setData(patient);
-                                }
-                            });
-                        }
+                dialogBuilder.setPositiveButton("Aceptar", (dialog, whichButton) -> {
+                    if (editItem.getText().toString().trim().length() != 0) {
+                        medicExamination.clear();
+                        medicExamination.addAll(patient.getMedicExamination());
+                        medicExamination.add(editItem.getText().toString().trim());
+                        patient.setMedicExamination(medicExamination);
+                        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).set(patient).addOnCompleteListener(task -> patientMedicExaminationAdapter.setData(patient));
                     }
                 });
                 break;
         }
 
-        dialogBuilder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int whichButton) {
-                dialog.dismiss();
-            }
-        });
+        dialogBuilder.setNegativeButton("Cancelar", (dialog, whichButton) -> dialog.dismiss());
         AlertDialog b = dialogBuilder.create();
         b.show();
     }

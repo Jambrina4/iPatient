@@ -1,6 +1,8 @@
 package com.ojambrina.ipatient.entities;
 
-public class Proffesional {
+import java.io.Serializable;
+
+public class Professional implements Serializable {
 
     private String name;
     private String surname;

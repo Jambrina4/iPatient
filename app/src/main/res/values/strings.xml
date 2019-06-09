@@ -72,4 +72,8 @@
     <string name="description">Descripción</string>
     <string name="add_your_profile_photo">Añade tu foto de perfil</string>
     <string name="add_clinic_image">Añade una foto a tu clínica</string>
+    <string name="query">Consulta</string>
+    <string name="suggestion">Sugerencia</string>
+    <string name="report_bug">Reportar problema</string>
+    <string name="disconnect">Desconectarse</string>
 </resources>
