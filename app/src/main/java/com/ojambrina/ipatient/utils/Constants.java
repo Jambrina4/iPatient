@@ -9,6 +9,7 @@ public class Constants {
     public static final String PATTERN = "dd-MM-yyyy";
     public static final String CLINICS = "clinics";
     public static final String CLINIC_LIST = "List of clinics";
+    public static final String CONNECTED_CLINIC_LIST = "Connected clinics";
     public static final String CLINIC_NAME = "clinic_name";
     public static final String CLINIC = "clinic";
     public static final String PATIENT = "patient";
@@ -17,4 +18,5 @@ public class Constants {
     public static final String SESSION_LIST = "List of sessions";
     public static final String PROFESSIONALS = "professionals";
     public static final String PROFESSIONAL = "professional";
+    public static final String HOME_TUTORIAL = "home_tutorial";
 }

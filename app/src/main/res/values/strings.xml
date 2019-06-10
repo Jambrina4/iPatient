@@ -48,7 +48,7 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_main2">Main2Activity</string>
-    <string name="assistance">Asistencia</string>
+    <string name="tecnic_assistance">Asistencia técnica</string>
     <string name="add_profile_photo">Añadir foto de Perfil</string>
     <string name="permission_needed">Permisos necesarios</string>
     <string name="grant_permission">Para continuar es necesario que actives manualmente los permisos de almacenamiento.\nPermisos -> Almacenamiento</string>
@@ -77,4 +77,9 @@
     <string name="report_bug">Reportar problema</string>
     <string name="disconnect">Desconectarse</string>
     <string name="text_configuration">Configuración</string>
+    <string name="welcome">Bienvenid@</string>
+    <string name="text_start">Pulsa este botón para desplegar un menú lateral en el cual podrás crear una clínica, agregar una clínica ya existente y/o solicitar asistencia</string>
+    <string name="text_patient_list">Aquí se mostrará una lista de pacientes de la clínica seleccionada en el menú lateral que hayas creado y/o agregado</string>
+    <string name="text_add_patient">Pulsa este botón para agregar un nuevo paciente</string>
+    <string name="understand">Entendido</string>
 </resources>

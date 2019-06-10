@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ojambrina.ipatient.R;
-import com.ojambrina.ipatient.entities.Clinic;
+import com.ojambrina.ipatient.entities.ConnectedClinic;
 import com.ojambrina.ipatient.utils.Utils;
 
 import java.util.ArrayList;
@@ -27,13 +27,13 @@ import static com.ojambrina.ipatient.utils.Constants.LATEST_CLINIC;
 public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder> {
 
     private Context context;
-    private List<Clinic> clinicList = new ArrayList<>();
-    private Clinic clinic;
+    private List<ConnectedClinic> clinicList = new ArrayList<>();
+    private ConnectedClinic clinic;
     private String clinicName;
     private OnClickListener listener;
     private SharedPreferences sharedPreferences;
 
-    public ClinicAdapter(Context context, List<Clinic> clinicList, SharedPreferences sharedPreferences, OnClickListener listener) {
+    public ClinicAdapter(Context context, List<ConnectedClinic> clinicList, SharedPreferences sharedPreferences, OnClickListener listener) {
         this.context = context;
         this.clinicList.addAll(clinicList);
         this.sharedPreferences = sharedPreferences;
@@ -93,10 +93,10 @@ public class ClinicAdapter extends RecyclerView.Adapter<ClinicAdapter.ViewHolder
     }
 
     public interface OnClickListener {
-        void onClick(int position, Clinic clinic);
+        void onClick(int position, ConnectedClinic clinic);
     }
 
-    public void setData(List<Clinic> list) {
+    public void setData(List<ConnectedClinic> list) {
         clinicList.clear();
         clinicList.addAll(list);
         notifyDataSetChanged();

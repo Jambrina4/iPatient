@@ -11,6 +11,9 @@ public class Professional implements Serializable {
     private String phone;
     private String image;
 
+    public Professional() {
+    }
+
     public String getName() {
         return name;
     }

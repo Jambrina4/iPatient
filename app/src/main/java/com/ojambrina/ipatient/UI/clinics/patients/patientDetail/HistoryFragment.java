@@ -140,8 +140,10 @@ public class HistoryFragment extends Fragment {
             }
             patient = documentSnapshot.toObject(Patient.class);
 
-            while (patient == null) {
-                Log.d("INFO", "CARGANDO DATOS DEL USUARIO");
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
             }
             setAdapters();
             printData();

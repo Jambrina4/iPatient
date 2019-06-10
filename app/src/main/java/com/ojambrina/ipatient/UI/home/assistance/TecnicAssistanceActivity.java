@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,14 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class AssistanceActivity extends AppCompatActivity {
+public class TecnicAssistanceActivity extends AppCompatActivity {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -44,7 +42,7 @@ public class AssistanceActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_assistance);
+        setContentView(R.layout.activity_tecnic_assistance);
         ButterKnife.bind(this);
 
         context = this;
@@ -116,6 +114,6 @@ public class AssistanceActivity extends AppCompatActivity {
 
     private void setToolbar() {
         Utils.configToolbar(contextForToolbar, toolbar);
-        toolbar.setTitle(getResources().getString(R.string.assistance));
+        toolbar.setTitle(getResources().getString(R.string.tecnic_assistance));
     }
 }

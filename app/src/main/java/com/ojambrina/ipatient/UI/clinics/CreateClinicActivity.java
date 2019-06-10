@@ -39,7 +39,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -49,6 +52,8 @@ import com.ojambrina.ipatient.BuildConfig;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.UI.home.HomeActivity;
 import com.ojambrina.ipatient.entities.Clinic;
+import com.ojambrina.ipatient.entities.ConnectedClinic;
+import com.ojambrina.ipatient.entities.Professional;
 import com.ojambrina.ipatient.utils.Utils;
 
 import java.io.File;
@@ -56,6 +61,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,7 +72,10 @@ import static com.ojambrina.ipatient.utils.Constants.CLINIC;
 import static com.ojambrina.ipatient.utils.Constants.CLINICS;
 import static com.ojambrina.ipatient.utils.Constants.CLINIC_LIST;
 import static com.ojambrina.ipatient.utils.Constants.CLINIC_NAME;
+import static com.ojambrina.ipatient.utils.Constants.CONNECTED_CLINIC_LIST;
 import static com.ojambrina.ipatient.utils.Constants.LATEST_CLINIC;
+import static com.ojambrina.ipatient.utils.Constants.PROFESSIONAL;
+import static com.ojambrina.ipatient.utils.Constants.PROFESSIONALS;
 import static com.ojambrina.ipatient.utils.Constants.SHARED_PREFERENCES;
 import static com.ojambrina.ipatient.utils.RequestCodes.IMAGE_FROM_CAMERA;
 import static com.ojambrina.ipatient.utils.RequestCodes.IMAGE_FROM_GALLERY;
@@ -101,6 +111,7 @@ public class CreateClinicActivity extends AppCompatActivity {
     //Declarations
     private Context context;
     private Clinic clinic;
+    private Professional professional;
     private FirebaseAuth firebaseAuth;
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -109,12 +120,14 @@ public class CreateClinicActivity extends AppCompatActivity {
     private String name, password, direction, clinicIdentityNumber, description;
     private boolean isValidClinicName, isValidClinicPassword;
     private SharedPreferences sharedPreferences;
-    private List<Clinic> clinicList = new ArrayList<>();
+    private ConnectedClinic connectedClinic;
     private String cameraPath;
     private File profilePath;
     private Uri imageUri;
     private Uri getImageUri;
     private Dialog dialog;
+    private Intent intent;
+    private String professionalName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +141,14 @@ public class CreateClinicActivity extends AppCompatActivity {
 
         setToolbar();
         setFirebase();
+        getProfessional();
         listeners();
+    }
+
+    private void getProfessional() {
+        intent = getIntent();
+        professional = (Professional) intent.getSerializableExtra(PROFESSIONAL);
+        professionalName = professional.getName() + " " + professional.getSurname();
     }
 
     private void listeners() {
@@ -157,33 +177,11 @@ public class CreateClinicActivity extends AppCompatActivity {
                                 Toast.makeText(context, "Ya existe una clínica con ese nombre", Toast.LENGTH_SHORT).show();
                             } else {
                                 addClinic();
-                                if (sharedPreferences.getString(CLINIC_LIST, "").isEmpty()) {
-                                    clinicList.clear();
-                                    Gson gson = new Gson();
-                                    clinicList.add(clinic);
-                                    String listOfClinics = gson.toJson(clinicList);
+                                addConnectedClinic();
 
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putString(CLINIC_LIST, listOfClinics);
-                                    editor.putString(LATEST_CLINIC, clinic.getName());
-                                    editor.apply();
-                                } else {
-                                    clinicList.clear();
-                                    Gson gson = new Gson();
-                                    String json = sharedPreferences.getString(CLINIC_LIST, "");
-
-                                    Type type = new TypeToken<List<Clinic>>() {
-                                    }.getType();
-                                    List<Clinic> clinicList = gson.fromJson(json, type);
-
-                                    clinicList.add(clinic);
-                                    String listOfClinics = gson.toJson(clinicList);
-
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putString(CLINIC_LIST, listOfClinics);
-                                    editor.putString(LATEST_CLINIC, clinic.getName());
-                                    editor.apply();
-                                }
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString(LATEST_CLINIC, clinic.getName());
+                                editor.apply();
 
                                 firebaseFirestore.collection(CLINICS).document(name).set(clinic);
                                 dialog.dismiss();
@@ -207,33 +205,11 @@ public class CreateClinicActivity extends AppCompatActivity {
                             Toast.makeText(context, "Ya existe una clínica con ese nombre", Toast.LENGTH_SHORT).show();
                         } else {
                             addClinic();
-                            if (sharedPreferences.getString(CLINIC_LIST, "").isEmpty()) {
-                                clinicList.clear();
-                                Gson gson = new Gson();
-                                clinicList.add(clinic);
-                                String listOfClinics = gson.toJson(clinicList);
+                            addConnectedClinic();
 
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(CLINIC_LIST, listOfClinics);
-                                editor.putString(LATEST_CLINIC, clinic.getName());
-                                editor.apply();
-                            } else {
-                                clinicList.clear();
-                                Gson gson = new Gson();
-                                String json = sharedPreferences.getString(CLINIC_LIST, "");
-
-                                Type type = new TypeToken<List<Clinic>>() {
-                                }.getType();
-                                List<Clinic> clinicList = gson.fromJson(json, type);
-
-                                clinicList.add(clinic);
-                                String listOfClinics = gson.toJson(clinicList);
-
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                editor.putString(CLINIC_LIST, listOfClinics);
-                                editor.putString(LATEST_CLINIC, clinic.getName());
-                                editor.apply();
-                            }
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString(LATEST_CLINIC, clinic.getName());
+                            editor.apply();
 
                             firebaseFirestore.collection(CLINICS).document(name).set(clinic);
                             dialog.dismiss();
@@ -252,6 +228,15 @@ public class CreateClinicActivity extends AppCompatActivity {
         layoutProfilePhoto.setOnClickListener(v -> showPictureDialog());
 
         toolbar.setNavigationOnClickListener(v -> onBackPressed());
+    }
+
+    private void addConnectedClinic() {
+        connectedClinic = new ConnectedClinic();
+        connectedClinic.setName(name);
+        if (imageUri != null) {
+            connectedClinic.setImage(String.valueOf(getImageUri));
+        }
+        firebaseFirestore.collection(PROFESSIONALS).document(professionalName).collection(CONNECTED_CLINIC_LIST).document(name).set(connectedClinic);
     }
 
     private void setToolbar() {
@@ -284,7 +269,7 @@ public class CreateClinicActivity extends AppCompatActivity {
     private void setFirebase() {
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference(CLINICS);
+        databaseReference = firebaseDatabase.getReference();
         firebaseFirestore = FirebaseFirestore.getInstance();
         storageReference = FirebaseStorage.getInstance().getReference();
     }
@@ -412,5 +397,13 @@ public class CreateClinicActivity extends AppCompatActivity {
             editClinicPassword.setError("Al menos 8 caracteres");
             isValidClinicPassword = false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(context, HomeActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

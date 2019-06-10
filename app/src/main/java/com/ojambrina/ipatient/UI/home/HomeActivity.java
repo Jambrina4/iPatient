@@ -17,50 +17,56 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.UI.clinics.CreateClinicActivity;
 import com.ojambrina.ipatient.UI.clinics.patients.AddPatient;
-import com.ojambrina.ipatient.UI.home.assistance.AssistanceActivity;
+import com.ojambrina.ipatient.UI.home.assistance.TecnicAssistanceActivity;
 import com.ojambrina.ipatient.UI.login.LoginActivity;
 import com.ojambrina.ipatient.adapters.ClinicAdapter;
 import com.ojambrina.ipatient.adapters.PatientAdapter;
 import com.ojambrina.ipatient.entities.Clinic;
+import com.ojambrina.ipatient.entities.ConnectedClinic;
 import com.ojambrina.ipatient.entities.Patient;
 import com.ojambrina.ipatient.entities.Professional;
 import com.ojambrina.ipatient.utils.AppPreferences;
 import com.ojambrina.ipatient.utils.Utils;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.ojambrina.ipatient.utils.Constants.CLINICS;
-import static com.ojambrina.ipatient.utils.Constants.CLINIC_LIST;
 import static com.ojambrina.ipatient.utils.Constants.CLINIC_NAME;
+import static com.ojambrina.ipatient.utils.Constants.CONNECTED_CLINIC_LIST;
+import static com.ojambrina.ipatient.utils.Constants.HOME_TUTORIAL;
 import static com.ojambrina.ipatient.utils.Constants.LATEST_CLINIC;
 import static com.ojambrina.ipatient.utils.Constants.NO_CLINIC_ADDED;
 import static com.ojambrina.ipatient.utils.Constants.PATIENTS;
+import static com.ojambrina.ipatient.utils.Constants.PROFESSIONAL;
 import static com.ojambrina.ipatient.utils.Constants.PROFESSIONALS;
 import static com.ojambrina.ipatient.utils.Constants.SHARED_PREFERENCES;
-import static com.ojambrina.ipatient.utils.RequestCodes.CREATE_CLINIC_REQUEST_CODE;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -93,8 +99,8 @@ public class HomeActivity extends AppCompatActivity {
     TextView textConnectClinic;
     @BindView(R.id.text_configuration)
     TextView textConfiguration;
-    @BindView(R.id.text_assistance)
-    TextView textAssistance;
+    @BindView(R.id.text_tecnic_assistance)
+    TextView textTecnicAssistance;
     @BindView(R.id.text_logout)
     TextView textLogout;
     @BindView(R.id.nav_view)
@@ -103,11 +109,23 @@ public class HomeActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     @BindView(R.id.profile_image)
     CircleImageView profileImage;
+    @BindView(R.id.text_start)
+    TextView textStart;
+    @BindView(R.id.layout_start)
+    LinearLayout layoutStart;
+    @BindView(R.id.text_welcome)
+    TextView textWelcome;
+    @BindView(R.id.text_patient_list)
+    TextView textPatientList;
+    @BindView(R.id.button_understand)
+    Button buttonUnderstand;
+    @BindView(R.id.layout_background_tutorial)
+    RelativeLayout layoutBackgroundTutorial;
 
     //Declarations
     private List<Clinic> clinicList = new ArrayList<>();
-    private List<Clinic> clinicListPreferences = new ArrayList<>();
     private List<Patient> patientList = new ArrayList<>();
+    private List<ConnectedClinic> connectedClinicList = new ArrayList<>();
     private ClinicAdapter clinicAdapter;
     private DatabaseReference databaseReference;
     private FirebaseFirestore firebaseFirestore;
@@ -127,6 +145,7 @@ public class HomeActivity extends AppCompatActivity {
     private boolean isValidClinicName;
     private Intent intent;
     private Professional professional;
+    private String fullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,11 +166,21 @@ public class HomeActivity extends AppCompatActivity {
         setDrawerAdapter();
         setPatientAdapter();
 
-        setClinicList();
         setPatientList();
 
         drawerListeners();
-        patientListeners();
+        listeners();
+    }
+
+    private void loadTutorial() {
+        if (!sharedPreferences.getBoolean(HOME_TUTORIAL, false)) {
+            layoutBackgroundTutorial.setVisibility(View.VISIBLE);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            homeTextNoData.setVisibility(View.GONE);
+            progressBarPatients.setVisibility(View.GONE);
+            String professionalName = professional.getName() + " " + professional.getSurname();
+            textWelcome.setText(professionalName);
+        }
     }
 
     private void setDrawerData() {
@@ -179,6 +208,8 @@ public class HomeActivity extends AppCompatActivity {
                 if (professionalList.get(i).getEmail().equals(email)) {
                     professional = professionalList.get(i);
 
+                    loadTutorial();
+                    setClinicList();
                     setDrawerData();
                 }
             }
@@ -187,7 +218,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setFirebase() {
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference(CLINICS);
+        databaseReference = firebaseDatabase.getReference();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     }
@@ -202,8 +233,8 @@ public class HomeActivity extends AppCompatActivity {
         toggle.syncState();
         toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.black));
 
-        clinicAdapter = new ClinicAdapter(context, clinicListPreferences, sharedPreferences, (position, clinic) -> {
-            latestClinic = clinicListPreferences.get(position).getName();
+        clinicAdapter = new ClinicAdapter(context, connectedClinicList, sharedPreferences, (position, connectedClinic) -> {
+            latestClinic = connectedClinicList.get(position).getName();
             toolbar.setTitle(latestClinic);
 
             if (sharedPreferences.getString(LATEST_CLINIC, "").isEmpty()) {
@@ -233,21 +264,53 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setClinicList() {
-        if (!sharedPreferences.getString(CLINIC_LIST, "").isEmpty()) {
-            clinicListPreferences.clear();
-            Gson gson = new Gson();
-            String json = sharedPreferences.getString(CLINIC_LIST, "");
-            Type type = new TypeToken<List<Clinic>>() {
-            }.getType();
-            clinicListPreferences.addAll(gson.fromJson(json, type));
-            drawerTextNoData.setVisibility(View.GONE);
-            progressBarDrawer.setVisibility(View.GONE);
-            recyclerClinic.setVisibility(View.VISIBLE);
-            clinicAdapter.setData(clinicListPreferences);
-        } else {
-            progressBarDrawer.setVisibility(View.GONE);
-            drawerTextNoData.setVisibility(View.VISIBLE);
-        }
+        fullName = professional.getName() + " " + professional.getSurname();
+        firebaseFirestore.collection(PROFESSIONALS).document(fullName).collection(CONNECTED_CLINIC_LIST).addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("ERROR", "Listen failed.", e);
+                    return;
+                }
+                List<ConnectedClinic> list = queryDocumentSnapshots.toObjects(ConnectedClinic.class);
+
+                if (!sharedPreferences.getBoolean(HOME_TUTORIAL, false)) {
+                    layoutBackgroundTutorial.setVisibility(View.VISIBLE);
+                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                    if (list.size() != 0) {
+                        connectedClinicList.clear();
+                        connectedClinicList.addAll(list);
+                        drawerTextNoData.setVisibility(View.GONE);
+                        progressBarDrawer.setVisibility(View.GONE);
+                        recyclerClinic.setVisibility(View.VISIBLE);
+                        clinicAdapter.setData(connectedClinicList);
+                        fab.show();
+                        homeTextNoData.setVisibility(View.GONE);
+                        progressBarPatients.setVisibility(View.GONE);
+                    } else {
+                        fab.hide();
+                        progressBarDrawer.setVisibility(View.GONE);
+                        drawerTextNoData.setVisibility(View.VISIBLE);
+                        homeTextNoData.setVisibility(View.GONE);
+                        progressBarPatients.setVisibility(View.GONE);
+                    }
+                } else {
+                    if (list.size() != 0) {
+                        connectedClinicList.clear();
+                        connectedClinicList.addAll(list);
+                        drawerTextNoData.setVisibility(View.GONE);
+                        progressBarDrawer.setVisibility(View.GONE);
+                        recyclerClinic.setVisibility(View.VISIBLE);
+                        clinicAdapter.setData(connectedClinicList);
+                        fab.show();
+                    } else {
+                        fab.hide();
+                        progressBarDrawer.setVisibility(View.GONE);
+                        drawerTextNoData.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        });
 
         firebaseFirestore.collection(CLINICS).addSnapshotListener((queryDocumentSnapshots, e) -> {
             if (e != null) {
@@ -274,12 +337,21 @@ public class HomeActivity extends AppCompatActivity {
             patientList.addAll(list);
             progressBarPatients.setVisibility(View.GONE);
 
-            if (patientList.size() == 0) {
-                homeTextNoData.setVisibility(View.VISIBLE);
-                recyclerPatients.setVisibility(View.GONE);
-            } else {
+            if (!sharedPreferences.getBoolean(HOME_TUTORIAL, false)) {
+                layoutBackgroundTutorial.setVisibility(View.VISIBLE);
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 homeTextNoData.setVisibility(View.GONE);
-                recyclerPatients.setVisibility(View.VISIBLE);
+                progressBarPatients.setVisibility(View.GONE);
+            } else {
+                if (patientList.size() == 0) {
+                    homeTextNoData.setVisibility(View.VISIBLE);
+                    recyclerPatients.setVisibility(View.GONE);
+                    fab.show();
+                } else {
+                    homeTextNoData.setVisibility(View.GONE);
+                    recyclerPatients.setVisibility(View.VISIBLE);
+                    fab.show();
+                }
             }
 
             patientAdapter.notifyDataSetChanged();
@@ -290,8 +362,10 @@ public class HomeActivity extends AppCompatActivity {
     private void drawerListeners() {
         textAddClinic.setOnClickListener(v -> {
             Intent intent = new Intent(context, CreateClinicActivity.class);
-            startActivityForResult(intent, CREATE_CLINIC_REQUEST_CODE);
+            intent.putExtra(PROFESSIONAL, professional);
+            startActivity(intent);
             drawerLayout.closeDrawer(Gravity.START);
+            finish();
         });
 
         textConnectClinic.setOnClickListener(v -> {
@@ -312,6 +386,7 @@ public class HomeActivity extends AppCompatActivity {
             textSend.setOnClickListener(v12 -> {
                 validateClinicName(editName);
 
+
                 if (isValidClinicName) {
                     clinicName = editName.getText().toString().trim();
                     clinicPassword = editPassword.getText().toString().trim();
@@ -319,49 +394,23 @@ public class HomeActivity extends AppCompatActivity {
                         for (int i = 0; i < clinicList.size(); i++) {
                             if (clinicList.get(i).getName().equals(clinicName)) {
                                 if (clinicList.get(i).getPassword().equals(clinicPassword)) {
-                                    if (sharedPreferences.getString(CLINIC_LIST, "").isEmpty()) {
-                                        clinicListPreferences.clear();
-                                        Gson gson = new Gson();
-                                        clinicListPreferences.add(clinicList.get(i));
-                                        String listOfClinics = gson.toJson(clinicListPreferences);
+                                    ConnectedClinic connectedClinic = new ConnectedClinic();
+                                    connectedClinic.setName(clinicList.get(i).getName());
+                                    connectedClinic.setImage(clinicList.get(i).getImage());
+                                    connectedClinicList.add(connectedClinic);
+                                    firebaseFirestore.collection(PROFESSIONALS).document(fullName).collection(CONNECTED_CLINIC_LIST).document(clinicList.get(i).getName()).set(connectedClinic);
 
-                                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                                        editor.putString(CLINIC_LIST, listOfClinics);
-                                        editor.putString(LATEST_CLINIC, clinicList.get(i).getName());
-                                        editor.apply();
-                                        dialog.dismiss();
+                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                    editor.putString(LATEST_CLINIC, clinicList.get(i).getName());
+                                    editor.apply();
+                                    dialog.dismiss();
 
-                                        setClinicList();
-                                        setPatientList();
-                                        updateClinicList(clinicListPreferences);
-                                        updatePatientList(clinicList.get(i).getName());
-                                        updateTitle(clinicList.get(i).getName());
-                                        break;
-                                    } else {
-                                        clinicListPreferences.clear();
-                                        Gson gson = new Gson();
-                                        String json = sharedPreferences.getString(CLINIC_LIST, "");
-
-                                        Type type = new TypeToken<List<Clinic>>() {
-                                        }.getType();
-                                        clinicListPreferences = gson.fromJson(json, type);
-
-                                        clinicListPreferences.add(clinicList.get(i));
-                                        String listOfClinics = gson.toJson(clinicListPreferences);
-
-                                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                                        editor.putString(CLINIC_LIST, listOfClinics);
-                                        editor.putString(LATEST_CLINIC, clinicList.get(i).getName());
-                                        editor.apply();
-                                        dialog.dismiss();
-
-                                        setClinicList();
-                                        setPatientList();
-                                        updateClinicList(clinicListPreferences);
-                                        updatePatientList(clinicList.get(i).getName());
-                                        updateTitle(clinicList.get(i).getName());
-                                        break;
-                                    }
+                                    setClinicList();
+                                    setPatientList();
+                                    updateClinicList(connectedClinicList);
+                                    updatePatientList(clinicList.get(i).getName());
+                                    updateTitle(clinicList.get(i).getName());
+                                    break;
                                 } else {
                                     editName.setError("Datos de inicio de sesion incorrectos");
                                     editPassword.setError("Datos de inicio de sesion incorrectos");
@@ -383,7 +432,6 @@ public class HomeActivity extends AppCompatActivity {
                     editPassword.setError("El campo no puede estar vacío");
                     editName.requestFocus();
                 }
-
             });
             dialog.show();
         });
@@ -394,9 +442,9 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        textAssistance.setOnClickListener(v -> {
+        textTecnicAssistance.setOnClickListener(v -> {
             drawerLayout.closeDrawer(Gravity.START);
-            Intent intent = new Intent(context, AssistanceActivity.class);
+            Intent intent = new Intent(context, TecnicAssistanceActivity.class);
             startActivity(intent);
         });
 
@@ -409,7 +457,7 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void updateClinicList(List<Clinic> list) {
+    private void updateClinicList(List<ConnectedClinic> list) {
         clinicAdapter.setData(list);
     }
 
@@ -428,9 +476,11 @@ public class HomeActivity extends AppCompatActivity {
             if (patientList.size() == 0) {
                 homeTextNoData.setVisibility(View.VISIBLE);
                 recyclerPatients.setVisibility(View.GONE);
+                fab.hide();
             } else {
                 homeTextNoData.setVisibility(View.GONE);
                 recyclerPatients.setVisibility(View.VISIBLE);
+                fab.show();
             }
 
             patientAdapter.notifyDataSetChanged();
@@ -441,7 +491,16 @@ public class HomeActivity extends AppCompatActivity {
         toolbar.setTitle(name);
     }
 
-    private void patientListeners() {
+    private void listeners() {
+        buttonUnderstand.setOnClickListener(v -> {
+            layoutBackgroundTutorial.setVisibility(View.GONE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(HOME_TUTORIAL, true);
+            editor.apply();
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            homeTextNoData.setVisibility(View.VISIBLE);
+        });
+
         fab.setOnClickListener(v -> addPatient());
     }
 

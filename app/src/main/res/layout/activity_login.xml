@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="32dp"
-                android:src="@drawable/app_logo" />
+                android:src="@drawable/app_logo_circle" />
         </LinearLayout>
 
         <LinearLayout

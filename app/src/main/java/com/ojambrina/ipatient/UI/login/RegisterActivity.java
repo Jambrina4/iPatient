@@ -45,12 +45,15 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.ojambrina.ipatient.BuildConfig;
 import com.ojambrina.ipatient.R;
+import com.ojambrina.ipatient.entities.ConnectedClinic;
 import com.ojambrina.ipatient.entities.Professional;
 import com.ojambrina.ipatient.utils.AppPreferences;
 import com.ojambrina.ipatient.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -108,6 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private String username, name, surname, identityNumber, phone, email, password;
     boolean isValidName, isValidSurname, isValidIdentityNumber, isValidPhone, isValidEmail, isValidPassword, isValidPasswordRepeat;
+    private List<ConnectedClinic> connectedClinicsList = new ArrayList<>();
     private Dialog dialog;
     private String cameraPath;
     private File profilePath;
@@ -115,6 +119,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Uri getImageUri;
 
     //TODO: Poner EditTextInputLayout en color blanco
+    //TODO: Crear checkbox politica de protección de datos
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
