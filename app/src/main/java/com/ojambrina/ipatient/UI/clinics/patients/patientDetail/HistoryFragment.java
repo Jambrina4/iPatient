@@ -141,7 +141,7 @@ public class HistoryFragment extends Fragment {
             patient = documentSnapshot.toObject(Patient.class);
 
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000);
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }

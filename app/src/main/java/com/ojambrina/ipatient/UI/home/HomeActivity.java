@@ -178,6 +178,7 @@ public class HomeActivity extends AppCompatActivity {
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
             homeTextNoData.setVisibility(View.GONE);
             progressBarPatients.setVisibility(View.GONE);
+            fab.hide();
             String professionalName = professional.getName() + " " + professional.getSurname();
             textWelcome.setText(professionalName);
         }
@@ -499,6 +500,7 @@ public class HomeActivity extends AppCompatActivity {
             editor.apply();
             drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             homeTextNoData.setVisibility(View.VISIBLE);
+            fab.hide();
         });
 
         fab.setOnClickListener(v -> addPatient());
