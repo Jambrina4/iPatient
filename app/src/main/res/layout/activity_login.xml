@@ -86,7 +86,6 @@
                 android:text="@string/remember_me"
                 android:textColor="@android:color/white" />
 
-
             <LinearLayout
                 android:id="@+id/layout_login"
                 android:layout_width="match_parent"

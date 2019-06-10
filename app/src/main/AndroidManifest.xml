@@ -28,6 +28,9 @@
         </provider>
 
         <activity
+            android:name=".UI.login.TermsConditionsActivity"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".UI.home.ConfigurationActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -61,4 +64,5 @@
             </intent-filter>
         </activity>
     </application>
+
 </manifest>

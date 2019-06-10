@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,10 +18,13 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -31,29 +33,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.ojambrina.ipatient.BuildConfig;
 import com.ojambrina.ipatient.R;
-import com.ojambrina.ipatient.entities.ConnectedClinic;
 import com.ojambrina.ipatient.entities.Professional;
 import com.ojambrina.ipatient.utils.AppPreferences;
 import com.ojambrina.ipatient.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,9 +92,14 @@ public class RegisterActivity extends AppCompatActivity {
     LinearLayout layoutBackgroundDeletePhoto;
     @BindView(R.id.layout_profile_photo)
     RelativeLayout layoutProfilePhoto;
+    @BindView(R.id.checkbox_terms_conditions)
+    CheckBox checkboxTermsConditions;
+    @BindView(R.id.text_terms_conditions)
+    TextView textTermsConditions;
 
     //Declarations
     private Context context;
+    private AppCompatActivity contextForToolbar;
     private AppPreferences appPreferences;
     private Professional professional;
     private FirebaseAuth firebaseAuth;
@@ -111,7 +110,6 @@ public class RegisterActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private String username, name, surname, identityNumber, phone, email, password;
     boolean isValidName, isValidSurname, isValidIdentityNumber, isValidPhone, isValidEmail, isValidPassword, isValidPasswordRepeat;
-    private List<ConnectedClinic> connectedClinicsList = new ArrayList<>();
     private Dialog dialog;
     private String cameraPath;
     private File profilePath;
@@ -128,18 +126,18 @@ public class RegisterActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         context = this;
+        contextForToolbar = this;
         appPreferences = new AppPreferences();
         firebaseStorage = FirebaseStorage.getInstance();
 
         setToolbar();
         setFirebase();
+        setTermsText();
         listeners();
     }
 
     private void setToolbar() {
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(null);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Utils.configToolbar(contextForToolbar, toolbar);
     }
 
     private void setFirebase() {
@@ -168,19 +166,47 @@ public class RegisterActivity extends AppCompatActivity {
             validateSurname(editSurname);
             validateName(editName);
 
+
             if (isValidName && isValidSurname && isValidIdentityNumber && isValidEmail && isValidPhone && isValidPassword && isValidPasswordRepeat) {
-                dialog = Utils.showProgressDialog(context, "Creando usuario");
-                dialog.show();
+                if (checkboxTermsConditions.isChecked()) {
+                    dialog = Utils.showProgressDialog(context, "Creando usuario");
+                    dialog.show();
 
-                if (imageUri != null) {
-                    StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
-                    sr.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
-                        Task<Uri> uri = sr.getDownloadUrl();
-                        do {
-                            Log.d("INFO", "SUBIENDO IMAGEN DE USUARIO");
-                        } while (!uri.isComplete());
-                        getImageUri = uri.getResult();
+                    if (imageUri != null) {
+                        StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
+                        sr.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
+                            Task<Uri> uri = sr.getDownloadUrl();
+                            do {
+                                Log.d("INFO", "SUBIENDO IMAGEN DE USUARIO");
+                            } while (!uri.isComplete());
+                            getImageUri = uri.getResult();
 
+                            setProfessional();
+
+                            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, task -> {
+                                if (task.isSuccessful()) {
+                                    firebaseFirestore.collection(PROFESSIONALS).document(username).set(professional).addOnSuccessListener(aVoid -> {
+                                        dialog.dismiss();
+                                        appPreferences.setEmail(email);
+
+                                        Log.d("REGISTRO", "createUserWithEmail:onComplete:" + task.isSuccessful());
+                                        FirebaseAuth.getInstance().signOut();
+
+                                        Intent intent = new Intent(context, LoginActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    });
+                                } else {
+                                    dialog.dismiss();
+                                    Toast.makeText(context, "Refistro fallido." + task.getException(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }).addOnFailureListener(e -> {
+                            dialog.dismiss();
+                            Toast.makeText(context, "Ha ocurrido un problema al agregar el usuario, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
+                            Log.d("TAG", e.getMessage());
+                        });
+                    } else {
                         setProfessional();
 
                         firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, task -> {
@@ -201,32 +227,9 @@ public class RegisterActivity extends AppCompatActivity {
                                 Toast.makeText(context, "Refistro fallido." + task.getException(), Toast.LENGTH_SHORT).show();
                             }
                         });
-                    }).addOnFailureListener(e -> {
-                        dialog.dismiss();
-                        Toast.makeText(context, "Ha ocurrido un problema al agregar el usuario, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
-                        Log.d("TAG", e.getMessage());
-                    });
+                    }
                 } else {
-                    setProfessional();
-
-                    firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(RegisterActivity.this, task -> {
-                        if (task.isSuccessful()) {
-                            firebaseFirestore.collection(PROFESSIONALS).document(username).set(professional).addOnSuccessListener(aVoid -> {
-                                dialog.dismiss();
-                                appPreferences.setEmail(email);
-
-                                Log.d("REGISTRO", "createUserWithEmail:onComplete:" + task.isSuccessful());
-                                FirebaseAuth.getInstance().signOut();
-
-                                Intent intent = new Intent(context, LoginActivity.class);
-                                startActivity(intent);
-                                finish();
-                            });
-                        } else {
-                            dialog.dismiss();
-                            Toast.makeText(context, "Refistro fallido." + task.getException(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    Toast.makeText(context, "Debes leer y aceptar los términos y condiciones para continuar", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -244,6 +247,18 @@ public class RegisterActivity extends AppCompatActivity {
         });
 
         layoutProfilePhoto.setOnClickListener(v -> showPictureDialog());
+
+        textTermsConditions.setOnClickListener(v -> {
+            Intent intent = new Intent(context, TermsConditionsActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void setTermsText() {
+        String textTerms = getResources().getString(R.string.accept_terms_conditions);
+        SpannableString spannableString = new SpannableString(textTerms);
+        spannableString.setSpan(new UnderlineSpan(), 11, textTerms.length(), 0);
+        textTermsConditions.setText(spannableString);
     }
 
     private void setProfessional() {

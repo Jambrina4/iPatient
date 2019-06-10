@@ -137,13 +137,37 @@
                     android:inputType="textPassword" />
             </android.support.design.widget.TextInputLayout>
 
+            <LinearLayout
+                android:layout_gravity="start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="32dp">
+
+                <CheckBox
+                    android:id="@+id/checkbox_terms_conditions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/text_terms_conditions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:padding="8dp"
+                    android:text="@string/accept_terms_conditions"
+                    android:textColor="@android:color/white" />
+            </LinearLayout>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_margin="32dp"
-                android:textColor="@android:color/white"
-                android:text="@string/add_profile_photo" />
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:layout_marginBottom="32dp"
+                android:text="@string/add_profile_photo"
+                android:textColor="@android:color/white" />
 
             <RelativeLayout
                 android:id="@+id/layout_profile_photo"
