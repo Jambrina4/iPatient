@@ -425,8 +425,13 @@ public class HomeActivity extends AppCompatActivity {
             patientList.clear();
             patientList.addAll(list);
 
-            homeTextNoData.setVisibility(View.GONE);
-            recyclerPatients.setVisibility(View.VISIBLE);
+            if (patientList.size() == 0) {
+                homeTextNoData.setVisibility(View.VISIBLE);
+                recyclerPatients.setVisibility(View.GONE);
+            } else {
+                homeTextNoData.setVisibility(View.GONE);
+                recyclerPatients.setVisibility(View.VISIBLE);
+            }
 
             patientAdapter.notifyDataSetChanged();
         });
