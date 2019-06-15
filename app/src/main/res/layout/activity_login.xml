@@ -33,38 +33,36 @@
             android:layout_weight="70"
             android:orientation="vertical">
 
-            <android.support.design.widget.TextInputLayout
-                style="@style/LoginTextInputLayout"
+            <TextView
+                style="@style/LoginTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email" />
+
+            <EditText
+                android:id="@+id/edit_email"
+                style="@style/LoginEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:textColor="@android:color/white" />
 
-                <EditText
-                    android:id="@+id/edit_email"
-                    style="@style/LoginEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/email"
-                    android:inputType="textEmailAddress"
-                    android:textColor="@android:color/white" />
-            </android.support.design.widget.TextInputLayout>
+            <TextView
+                style="@style/LoginTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/password" />
 
-            <android.support.design.widget.TextInputLayout
-                style="@style/LoginTextInputLayout"
+            <EditText
+                android:id="@+id/login_password"
+                style="@style/LoginEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
-
-                <EditText
-                    android:id="@+id/login_password"
-                    style="@style/LoginEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/password"
-                    android:imeOptions="actionDone"
-                    android:inputType="textPassword"
-                    android:textColor="@android:color/white" />
-            </android.support.design.widget.TextInputLayout>
+                android:hint="@string/password"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword"
+                android:textColor="@android:color/white" />
 
             <TextView
                 android:id="@+id/forgot_password"

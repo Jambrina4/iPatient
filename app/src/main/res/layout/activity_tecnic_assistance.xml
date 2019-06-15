@@ -72,5 +72,16 @@
             android:layout_gravity="center"
             android:layout_margin="16dp"
             android:text="@string/text_send" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/text_bug_replication"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="32dp"
+        android:text="@string/bug_replication"
+        android:visibility="gone" />
 </LinearLayout>

@@ -258,7 +258,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setPatientAdapter() {
-        patientAdapter = new PatientAdapter(context, patientList, latestClinic);
+        patientAdapter = new PatientAdapter(context, patientList, latestClinic, firebaseFirestore);
         GridLayoutManager layout = new GridLayoutManager(context, 3);
         recyclerPatients.setLayoutManager(layout);
         recyclerPatients.setAdapter(patientAdapter);

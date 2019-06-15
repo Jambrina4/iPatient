@@ -13,41 +13,51 @@
     <style name="LoginEditText" parent="android:Widget.EditText">
         <item name="android:layout_marginStart">16dp</item>
         <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:layout_marginTop">16dp</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textColorHint">@android:color/white</item>
         <item name="android:backgroundTint">@android:color/white</item>
     </style>
 
-    <style name="LoginTextInputLayout">
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
-    <style name="RegisterTextInputLayout">
-        <item name="android:layout_marginTop">8dp</item>
-    </style>
-
     <style name="RegisterEditText" parent="android:Widget.EditText">
-        <item name="android:layout_marginTop">32dp</item>
         <item name="android:layout_marginStart">32dp</item>
         <item name="android:layout_marginEnd">32dp</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textColorHint">@android:color/white</item>
         <item name="android:backgroundTint">@android:color/transparent</item>
-
     </style>
 
     <style name="LoginTextView" parent="android:Widget.TextView">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:layout_margin">16dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginStart">18dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAlignment">center</item>
     </style>
 
     <style name="RegisterTextView" parent="android:Widget.TextView">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:layout_marginTop">32dp</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginStart">36dp</item>
+        <item name="android:layout_marginEnd">32dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="AddClinicPatientEditText" parent="android:Widget.EditText">
         <item name="android:layout_marginStart">32dp</item>
         <item name="android:layout_marginEnd">32dp</item>
-        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColorHint">@android:color/black</item>
+        <item name="android:backgroundTint">@android:color/black</item>
+    </style>
+
+    <style name="AddClinicPatientTextView" parent="android:Widget.TextView">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:layout_marginStart">35dp</item>
+        <item name="android:layout_marginEnd">32dp</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
@@ -58,4 +68,10 @@
     <style name="AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="android:textColorPrimary">@color/colorPrimary</item>
+        <item name="android:background">@android:color/white</item>
+    </style>
 </resources>

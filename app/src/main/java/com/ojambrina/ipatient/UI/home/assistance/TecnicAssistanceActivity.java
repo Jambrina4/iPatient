@@ -1,6 +1,7 @@
 package com.ojambrina.ipatient.UI.home.assistance;
 
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,6 +34,8 @@ public class TecnicAssistanceActivity extends AppCompatActivity {
     EditText editDescription;
     @BindView(R.id.button_send)
     Button buttonSend;
+    @BindView(R.id.text_bug_replication)
+    TextView textBugReplication;
 
     private Context context;
     private AppCompatActivity contextForToolbar;
@@ -64,20 +67,21 @@ public class TecnicAssistanceActivity extends AppCompatActivity {
             query.setOnClickListener(v1 -> {
                 dialog.dismiss();
                 textCategory.setText(query.getText().toString());
+                textBugReplication.setVisibility(View.GONE);
             });
 
             suggestion.setOnClickListener(v12 -> {
                 dialog.dismiss();
                 textCategory.setText(suggestion.getText().toString());
+                textBugReplication.setVisibility(View.GONE);
             });
 
             reportBug.setOnClickListener(v13 -> {
                 dialog.dismiss();
                 textCategory.setText(reportBug.getText().toString());
+                textBugReplication.setVisibility(View.VISIBLE);
             });
         });
-
-        //TODO botón send me envía un mail con el contenido
 
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,11 +102,7 @@ public class TecnicAssistanceActivity extends AppCompatActivity {
                     intent.putExtra(Intent.EXTRA_TEXT, message);
                     try {
                         startActivity(Intent.createChooser(intent, "Enviar email..."));
-
-                        //TODO cerrar activity cuando haya abierto la app de correo
-
-                        finish();
-                    } catch (android.content.ActivityNotFoundException ex) {
+                    } catch (ActivityNotFoundException ex) {
                         Toast.makeText(context, "No hay aplicaciones de email enviadas.", Toast.LENGTH_SHORT).show();
                     }
                 }

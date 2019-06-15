@@ -159,7 +159,7 @@ public class CreateClinicActivity extends AppCompatActivity {
             validateClinicName(editClinicName);
 
             if (isValidClinicName && isValidClinicPassword) {
-                dialog = Utils.showProgressDialog(context, "Creando clínica");
+                dialog = Utils.showProgressDialog(context, "Creando clínica", R.style.AppCompatAlertDialogStyle);
                 dialog.show();
 
                 if (imageUri != null) {

@@ -12,7 +12,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/tutorial_background"
-        android:visibility="gone">
+        android:visibility="gone"
+        tools:visibility="visible">
 
         <LinearLayout
             android:id="@+id/layout_start"
@@ -25,7 +26,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="16dp"
-                android:src="@drawable/ic_arrow_upward_black_24dp" />
+                android:src="@drawable/ic_arrow_upward_black_24dp"
+                android:tint="@android:color/white" />
 
             <TextView
                 android:id="@+id/text_start"
@@ -33,7 +35,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="32dp"
-                android:text="@string/text_start" />
+                android:text="@string/text_start"
+                android:textColor="@android:color/white" />
         </LinearLayout>
 
         <LinearLayout
@@ -48,12 +51,16 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/welcome"/>
+                android:text="@string/welcome"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/text_welcome"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="20sp" />
         </LinearLayout>
 
         <TextView
@@ -62,7 +69,8 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_margin="32dp"
-            android:text="@string/text_patient_list" />
+            android:text="@string/text_patient_list"
+            android:textColor="@android:color/white" />
 
         <TextView
             android:layout_width="128dp"
@@ -70,7 +78,8 @@
             android:layout_above="@id/fab_tutorial"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="16dp"
-            android:text="@string/text_add_patient" />
+            android:text="@string/text_add_patient"
+            android:textColor="@android:color/white" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_tutorial"
@@ -80,6 +89,7 @@
             android:layout_alignParentBottom="true"
             android:layout_gravity="end"
             android:layout_margin="32dp"
+            android:backgroundTint="@color/colorPrimary"
             android:tint="@android:color/white"
             app:srcCompat="@android:drawable/ic_input_add" />
 
@@ -112,6 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:indeterminate="true"
+                android:indeterminateTint="@color/colorPrimary"
                 android:visibility="gone" />
 
             <TextView
@@ -141,6 +152,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_gravity="end"
                 android:layout_margin="32dp"
+                android:backgroundTint="@color/colorPrimary"
                 android:tint="@android:color/white"
                 android:visibility="gone"
                 app:srcCompat="@android:drawable/ic_input_add" />

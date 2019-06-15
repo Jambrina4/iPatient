@@ -2,7 +2,7 @@ package com.ojambrina.ipatient.UI.clinics.patients.patientDetail;
 
 
 import android.content.Context;
-import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -12,19 +12,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.adapters.PatientMedicConditionsAdapter;
 import com.ojambrina.ipatient.adapters.PatientMedicExaminationAdapter;
@@ -32,11 +29,10 @@ import com.ojambrina.ipatient.adapters.PatientRegularExerciseAdapter;
 import com.ojambrina.ipatient.adapters.PatientRegularMedicationAdapter;
 import com.ojambrina.ipatient.adapters.PatientSurgicalOperationsAdapter;
 import com.ojambrina.ipatient.entities.Patient;
+import com.ojambrina.ipatient.utils.MyScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -45,9 +41,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.ojambrina.ipatient.utils.Constants.CLINICS;
 import static com.ojambrina.ipatient.utils.Constants.CLINIC_NAME;
+import static com.ojambrina.ipatient.utils.Constants.HISTORY_TUTORIAL;
 import static com.ojambrina.ipatient.utils.Constants.PATIENT;
 import static com.ojambrina.ipatient.utils.Constants.PATIENTS;
 import static com.ojambrina.ipatient.utils.Constants.PATIENT_NAME;
+import static com.ojambrina.ipatient.utils.Constants.SHARED_PREFERENCES;
 
 public class HistoryFragment extends Fragment {
 
@@ -86,6 +84,16 @@ public class HistoryFragment extends Fragment {
     ImageView imageAddSurgicalOperation;
     @BindView(R.id.image_add_medic_examination)
     ImageView imageAddMedicExamination;
+    @BindView(R.id.text_patient_data)
+    TextView textPatientData;
+    @BindView(R.id.text_patient_health_data)
+    TextView textPatientHealthData;
+    @BindView(R.id.button_understand)
+    Button buttonUnderstand;
+    @BindView(R.id.layout_background_tutorial)
+    RelativeLayout layoutBackgroundTutorial;
+    @BindView(R.id.scroll_history)
+    MyScrollView scrollHistory;
 
     private Context context;
     private FirebaseDatabase firebaseDatabase;
@@ -104,6 +112,7 @@ public class HistoryFragment extends Fragment {
     private List<String> regularExercise = new ArrayList<>();
     private List<String> surgicalOperations = new ArrayList<>();
     private List<String> medicExamination = new ArrayList<>();
+    private SharedPreferences sharedPreferences;
     Unbinder unbinder;
 
     public HistoryFragment() {
@@ -121,33 +130,35 @@ public class HistoryFragment extends Fragment {
             clinicName = (String) getArguments().get(CLINIC_NAME);
         }
 
+        sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         context = getContext();
 
+        loadTutorial();
         setFirebase();
-        getPatientData();
+        setAdapters();
+        printData();
         listeners();
 
         return view;
     }
 
-    //TODO Revisar metodo de recogida de datos de paciente
-
-    private void getPatientData() {
-        firebaseFirestore.collection(CLINICS).document(clinicName).collection(PATIENTS).document(patientName).addSnapshotListener((documentSnapshot, e) -> {
-            if (e != null) {
-                Log.w("ERROR", "Listen failed.", e);
-                return;
-            }
-            patient = documentSnapshot.toObject(Patient.class);
-
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-            setAdapters();
-            printData();
-        });
+    private void loadTutorial() {
+        if (!sharedPreferences.getBoolean(HISTORY_TUTORIAL, false)) {
+            layoutBackgroundTutorial.setVisibility(View.VISIBLE);
+            scrollHistory.setScrolling(false);
+            recyclerSurgicalOperations.setVisibility(View.GONE);
+            recyclerRegularExercise.setVisibility(View.GONE);
+            recyclerMedicExamination.setVisibility(View.GONE);
+            recyclerMedicConditions.setVisibility(View.GONE);
+            recyclerMedication.setVisibility(View.GONE);
+        } else {
+            scrollHistory.setScrolling(true);
+            recyclerSurgicalOperations.setVisibility(View.VISIBLE);
+            recyclerRegularExercise.setVisibility(View.VISIBLE);
+            recyclerMedicExamination.setVisibility(View.VISIBLE);
+            recyclerMedicConditions.setVisibility(View.VISIBLE);
+            recyclerMedication.setVisibility(View.VISIBLE);
+        }
     }
 
     private void setAdapters() {
@@ -164,15 +175,48 @@ public class HistoryFragment extends Fragment {
     }
 
     private void listeners() {
-        imageAddMedication.setOnClickListener(v -> showDialog(0));
+        imageAddMedication.setOnClickListener(v -> {
+            if (sharedPreferences.getBoolean(HISTORY_TUTORIAL, false)) {
+                showDialog(0);
+            }
+        });
 
-        imageAddMedicCondition.setOnClickListener(v -> showDialog(1));
+        imageAddMedicCondition.setOnClickListener(v -> {
+            if (sharedPreferences.getBoolean(HISTORY_TUTORIAL, false)) {
+                showDialog(1);
+            }
+        });
 
-        imageAddExercise.setOnClickListener(v -> showDialog(2));
+        imageAddExercise.setOnClickListener(v -> {
+            if (sharedPreferences.getBoolean(HISTORY_TUTORIAL, false)) {
+                showDialog(2);
+            }
+        });
 
-        imageAddSurgicalOperation.setOnClickListener(v -> showDialog(3));
+        imageAddSurgicalOperation.setOnClickListener(v -> {
+            if (sharedPreferences.getBoolean(HISTORY_TUTORIAL, false)) {
+                showDialog(3);
+            }
+        });
 
-        imageAddMedicExamination.setOnClickListener(v -> showDialog(4));
+        imageAddMedicExamination.setOnClickListener(v -> {
+            if (sharedPreferences.getBoolean(HISTORY_TUTORIAL, false)) {
+                showDialog(4);
+            }
+        });
+
+        buttonUnderstand.setOnClickListener(v -> {
+            layoutBackgroundTutorial.setVisibility(View.GONE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(HISTORY_TUTORIAL, true);
+            editor.apply();
+            scrollHistory.setScrolling(true);
+            recyclerSurgicalOperations.setVisibility(View.VISIBLE);
+            recyclerRegularExercise.setVisibility(View.VISIBLE);
+            recyclerMedicExamination.setVisibility(View.VISIBLE);
+            recyclerMedicConditions.setVisibility(View.VISIBLE);
+            recyclerMedication.setVisibility(View.VISIBLE);
+        });
     }
 
     private void setFirebase() {

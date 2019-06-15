@@ -19,4 +19,6 @@ public class Constants {
     public static final String PROFESSIONALS = "professionals";
     public static final String PROFESSIONAL = "professional";
     public static final String HOME_TUTORIAL = "home_tutorial";
+    public static final String HISTORY_TUTORIAL = "history_tutorial";
+    public static final String FISIO_TUTORIAL = "fisio_tutorial";
 }

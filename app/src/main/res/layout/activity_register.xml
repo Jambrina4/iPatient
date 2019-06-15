@@ -16,131 +16,122 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:orientation="vertical"
             android:weightSum="100">
 
-            <android.support.design.widget.TextInputLayout
+            <TextView
+                android:layout_width="wrap_content"
+                style="@style/RegisterTextView"
+                android:layout_height="wrap_content"
+                android:text="@string/name" />
+
+            <EditText
+                android:id="@+id/edit_name"
+                style="@style/RegisterEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColorHint="@android:color/white">
+                android:backgroundTint="@android:color/white"
+                android:hint="@string/name"
+                android:singleLine="true" />
 
-                <EditText
-                    android:id="@+id/edit_name"
-                    style="@style/RegisterEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="64dp"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/name"
-                    android:singleLine="true" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                style="@style/RegisterTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
-
-                <EditText
-                    android:id="@+id/edit_surname"
-                    style="@style/RegisterEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/surname"
-                    android:singleLine="true"
-                    android:textColor="@android:color/white" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                style="@style/RegisterTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
-
-                <EditText
-                    android:id="@+id/edit_identity_number"
-                    style="@style/RegisterEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/identityNumber"
-                    android:singleLine="true" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                style="@style/RegisterTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
-
-                <EditText
-                    android:id="@+id/edit_email"
-                    style="@style/RegisterEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/email"
-                    android:inputType="textEmailAddress" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                style="@style/RegisterTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
-
-                <EditText
-                    android:id="@+id/edit_phone"
-                    style="@style/RegisterEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/phone"
-                    android:inputType="number"
-                    android:singleLine="true" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                style="@style/RegisterTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
-
-                <EditText
-                    android:id="@+id/edit_password"
-                    style="@style/RegisterEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/password"
-                    android:inputType="textPassword"
-                    android:textColor="@android:color/white" />
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                style="@style/RegisterTextInputLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColorHint="@android:color/white">
-
-                <EditText
-                    android:id="@+id/edit_password_repeat"
-                    style="@style/RegisterEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/password_repeat"
-                    android:imeOptions="actionDone"
-                    android:inputType="textPassword" />
-            </android.support.design.widget.TextInputLayout>
-
-            <LinearLayout
-                android:layout_gravity="start"
+            <TextView
+                style="@style/RegisterTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="@string/surname" />
+
+            <EditText
+                android:id="@+id/edit_surname"
+                style="@style/RegisterEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/white"
+                android:hint="@string/surname"
+                android:singleLine="true"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                style="@style/RegisterTextView"
+                android:layout_height="wrap_content"
+                android:text="@string/identityNumber" />
+
+            <EditText
+                android:id="@+id/edit_identity_number"
+                style="@style/RegisterEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/white"
+                android:hint="@string/identityNumber"
+                android:singleLine="true" />
+
+            <TextView
+                style="@style/RegisterTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/email" />
+
+            <EditText
+                android:id="@+id/edit_email"
+                style="@style/RegisterEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/white"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                style="@style/RegisterTextView"
+                android:layout_height="wrap_content"
+                android:text="@string/phone" />
+
+            <EditText
+                android:id="@+id/edit_phone"
+                style="@style/RegisterEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/white"
+                android:hint="@string/phone"
+                android:inputType="phone"
+                android:singleLine="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                style="@style/RegisterTextView"
+                android:layout_height="wrap_content"
+                android:text="@string/password" />
+
+            <EditText
+                android:id="@+id/edit_password"
+                style="@style/RegisterEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/white"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:textColor="@android:color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                style="@style/RegisterTextView"
+                android:layout_height="wrap_content"
+                android:text="@string/password_repeat" />
+
+            <EditText
+                android:id="@+id/edit_password_repeat"
+                style="@style/RegisterEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@android:color/white"
+                android:hint="@string/password_repeat"
+                android:imeOptions="actionDone"
+                android:inputType="textPassword" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
                 android:layout_margin="32dp">
 
                 <CheckBox

@@ -34,8 +34,8 @@ import static com.ojambrina.ipatient.utils.Constants.PATTERN;
 
 public class Utils {
 
-    public static ProgressDialog showProgressDialog(Context context, String message) {
-        ProgressDialog progressDialog = new ProgressDialog(context);
+    public static ProgressDialog showProgressDialog(Context context, String message, int appCompatAlertDialogStyle) {
+        ProgressDialog progressDialog = new ProgressDialog(context, appCompatAlertDialogStyle);
         progressDialog.setMessage(message);
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.setIndeterminate(true);

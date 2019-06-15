@@ -52,8 +52,6 @@ public class SessionHighlightAdapter extends RecyclerView.Adapter<SessionHighlig
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        @BindView(R.id.image_detail)
-        ImageView imageDetail;
         @BindView(R.id.text_detail)
         TextView textDetail;
 

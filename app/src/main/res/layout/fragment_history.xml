@@ -7,7 +7,8 @@
     android:background="@drawable/gradient_background"
     tools:context=".UI.clinics.patients.patientDetail.HistoryFragment">
 
-    <ScrollView
+    <com.ojambrina.ipatient.utils.MyScrollView
+        android:id="@+id/scroll_history"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -254,5 +255,54 @@
                     android:src="@drawable/ic_add_box_black_24dp" />
             </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </com.ojambrina.ipatient.utils.MyScrollView>
+
+    <RelativeLayout
+        android:id="@+id/layout_background_tutorial"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/tutorial_background"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/text_patient_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="96dp"
+            android:layout_marginEnd="32dp"
+            android:text="@string/patient_data"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/text_patient_health_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_patient_data"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="128dp"
+            android:layout_marginEnd="32dp"
+            android:text="@string/patient_health"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/text_patient_health_data"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
+            android:text="@string/patient_add_health_info"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/button_understand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerInParent="true"
+            android:layout_marginBottom="32dp"
+            android:text="@string/understand" />
+    </RelativeLayout>
 </FrameLayout>

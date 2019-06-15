@@ -176,7 +176,7 @@ public class AddPatient extends AppCompatActivity {
             validateName(editPatientName);
 
             if (isValidPatientName && isValidPatientSurname && isValidPatientBornDate && isValidPatientPhone && isValidPatientEmail && isValidPatientProfession) {
-                dialog = Utils.showProgressDialog(context, "Añadiendo paciente");
+                dialog = Utils.showProgressDialog(context, "Añadiendo paciente", R.style.AppCompatAlertDialogStyle);
                 dialog.show();
 
                 if (clinic_name.equals(NO_CLINIC_ADDED)) {

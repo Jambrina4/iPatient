@@ -2,6 +2,7 @@ package com.ojambrina.ipatient.UI.clinics.patients.patientDetail;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -9,9 +10,13 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,6 +31,7 @@ import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.adapters.SessionAdapter;
 import com.ojambrina.ipatient.entities.Patient;
 import com.ojambrina.ipatient.entities.Session;
+import com.ojambrina.ipatient.utils.MyLinearLayoutManager;
 import com.ojambrina.ipatient.utils.Utils;
 
 import java.text.ParseException;
@@ -42,11 +48,12 @@ import butterknife.Unbinder;
 
 import static com.ojambrina.ipatient.utils.Constants.CLINICS;
 import static com.ojambrina.ipatient.utils.Constants.CLINIC_NAME;
-import static com.ojambrina.ipatient.utils.Constants.PATIENT;
+import static com.ojambrina.ipatient.utils.Constants.FISIO_TUTORIAL;
 import static com.ojambrina.ipatient.utils.Constants.PATIENTS;
 import static com.ojambrina.ipatient.utils.Constants.PATIENT_NAME;
 import static com.ojambrina.ipatient.utils.Constants.PATTERN;
 import static com.ojambrina.ipatient.utils.Constants.SESSION_LIST;
+import static com.ojambrina.ipatient.utils.Constants.SHARED_PREFERENCES;
 
 public class FisioFragment extends Fragment {
 
@@ -54,6 +61,16 @@ public class FisioFragment extends Fragment {
     RecyclerView recyclerSession;
     @BindView(R.id.add_session)
     FloatingActionButton fab;
+    @BindView(R.id.text_session_date_tutorial)
+    TextView textSessionDateTutorial;
+    @BindView(R.id.layout_start)
+    LinearLayout layoutStart;
+    @BindView(R.id.fab_tutorial)
+    FloatingActionButton fabTutorial;
+    @BindView(R.id.button_understand)
+    Button buttonUnderstand;
+    @BindView(R.id.layout_background_tutorial)
+    RelativeLayout layoutBackgroundTutorial;
 
     private FirebaseDatabase firebaseDatabase;
     private DatabaseReference databaseReference;
@@ -68,7 +85,9 @@ public class FisioFragment extends Fragment {
     private List<String> explorationList = new ArrayList<>();
     private List<String> treatmentList = new ArrayList<>();
     private SessionAdapter sessionAdapter;
+    private SharedPreferences sharedPreferences;
     private Session session;
+    private MyLinearLayoutManager myLinearLayoutManager;
 
     Unbinder unbinder;
 
@@ -82,13 +101,15 @@ public class FisioFragment extends Fragment {
         unbinder = ButterKnife.bind(this, view);
 
         if (getArguments() != null) {
-            patient = (Patient) getArguments().get(PATIENT);
             clinic_name = (String) getArguments().get(CLINIC_NAME);
             patientName = (String) getArguments().get(PATIENT_NAME);
         }
 
+        sharedPreferences = this.getActivity().getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
         context = getContext();
+        myLinearLayoutManager = new MyLinearLayoutManager(context);
 
+        loadTutorial();
         setFirebase();
         getSessionList();
         setAdapter();
@@ -97,10 +118,20 @@ public class FisioFragment extends Fragment {
         return view;
     }
 
-    //TODO HACER PANTALLA DE TUTORIAL
+    private void loadTutorial() {
+        if (!sharedPreferences.getBoolean(FISIO_TUTORIAL, false)) {
+            layoutBackgroundTutorial.setVisibility(View.VISIBLE);
+            myLinearLayoutManager.setScrollEnabled(false);
+            recyclerSession.setVisibility(View.GONE);
+        } else {
+            myLinearLayoutManager.setScrollEnabled(true);
+            recyclerSession.setVisibility(View.VISIBLE);
+        }
+    }
 
     private void setAdapter() {
         sessionAdapter = new SessionAdapter(context, session, sessionList, clinic_name, patientName, firebaseFirestore);
+        recyclerSession.setLayoutManager(myLinearLayoutManager);
         recyclerSession.setAdapter(sessionAdapter);
     }
 
@@ -118,36 +149,42 @@ public class FisioFragment extends Fragment {
             sessionAdapter.notifyDataSetChanged();
         });
 
-        fab.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                Calendar calendar = Calendar.getInstance();
+        fab.setOnLongClickListener(v -> {
+            Calendar calendar = Calendar.getInstance();
 
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                int month = calendar.get(Calendar.MONTH);
-                int year = calendar.get(Calendar.YEAR);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(context, (view, year1, month1, dayOfMonth) -> {
-                    month1 = month1 + 1;
-                    String dayCorrected;
-                    if (dayOfMonth < 10) {
-                        dayCorrected = "0" + dayOfMonth;
-                    } else {
-                        dayCorrected = String.valueOf(dayOfMonth);
-                    }
-                    String monthCorrected;
-                    if (month1 < 10) {
-                        monthCorrected = "0" + month1;
-                    } else {
-                        monthCorrected = String.valueOf(month1);
-                    }
-                    String sessionDate = dayCorrected + "-" + monthCorrected + "-" + year1;
-                    addFutureSession(sessionDate);
-                    firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(patientName).collection(SESSION_LIST).document(sessionDate).set(session);
-                }, year, month, day);
-                datePickerDialog.show();
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH);
+            int year = calendar.get(Calendar.YEAR);
+            DatePickerDialog datePickerDialog = new DatePickerDialog(context, (view, year1, month1, dayOfMonth) -> {
+                month1 = month1 + 1;
+                String dayCorrected;
+                if (dayOfMonth < 10) {
+                    dayCorrected = "0" + dayOfMonth;
+                } else {
+                    dayCorrected = String.valueOf(dayOfMonth);
+                }
+                String monthCorrected;
+                if (month1 < 10) {
+                    monthCorrected = "0" + month1;
+                } else {
+                    monthCorrected = String.valueOf(month1);
+                }
+                String sessionDate = dayCorrected + "-" + monthCorrected + "-" + year1;
+                addFutureSession(sessionDate);
+                firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(patientName).collection(SESSION_LIST).document(sessionDate).set(session);
+            }, year, month, day);
+            datePickerDialog.show();
 
-                return false;
-            }
+            return false;
+        });
+
+        buttonUnderstand.setOnClickListener(v -> {
+            layoutBackgroundTutorial.setVisibility(View.GONE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(FISIO_TUTORIAL, true);
+            editor.apply();
+            myLinearLayoutManager.setScrollEnabled(true);
+            recyclerSession.setVisibility(View.VISIBLE);
         });
     }
 

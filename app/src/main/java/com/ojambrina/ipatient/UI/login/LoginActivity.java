@@ -74,8 +74,6 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseFirestore firebaseFirestore;
     private Professional professional;
 
-    //TODO: Poner EditTextInputLayout en color blanco
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,7 +124,7 @@ public class LoginActivity extends AppCompatActivity {
                 email = editRecoverEmail.getText().toString().trim();
 
                 if (email.length() > 0) {
-                    progressDialog = Utils.showProgressDialog(context, "Enviando email de recuperación");
+                    progressDialog = Utils.showProgressDialog(context, "Enviando email de recuperación", R.style.AppCompatAlertDialogStyle);
                     progressDialog.show();
                     FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -155,7 +153,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void login() {
-        progressDialog = Utils.showProgressDialog(context, "Iniciando sesión");
+        progressDialog = Utils.showProgressDialog(context, "Iniciando sesión", R.style.AppCompatAlertDialogStyle);
         progressDialog.show();
 
         firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(LoginActivity.this, task -> {

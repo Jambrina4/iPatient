@@ -26,10 +26,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     private Patient patient;
     private FirebaseFirestore firebaseFirestore;
 
-    public ViewPagerAdapter(FragmentManager fragmentManager, Context context, String clinic_name, String patientName, FirebaseFirestore firebaseFirestore) {
+    public ViewPagerAdapter(FragmentManager fragmentManager, Context context, Patient patient, String clinic_name, String patientName, FirebaseFirestore firebaseFirestore) {
         super(fragmentManager);
         this.context = context;
-        //this.patient = patient;
+        this.patient = patient;
         this.clinic_name = clinic_name;
         this.patientName = patientName;
         this.firebaseFirestore = firebaseFirestore;
@@ -47,23 +47,22 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                //HistoryFragment.newInstance();
                 HistoryFragment historyFragment = new HistoryFragment();
-                //bundle.putSerializable(PATIENT, patient);
+                bundle.putSerializable(PATIENT, patient);
                 bundle.putSerializable(CLINIC_NAME, clinic_name);
                 bundle.putSerializable(PATIENT_NAME, patientName);
                 historyFragment.setArguments(bundle);
                 return historyFragment;
             case 1:
                 FisioFragment fisioFragment = new FisioFragment();
-                //bundle.putSerializable(PATIENT, patient);
+                bundle.putSerializable(PATIENT, patient);
                 bundle.putSerializable(CLINIC_NAME, clinic_name);
                 bundle.putSerializable(PATIENT_NAME, patientName);
                 fisioFragment.setArguments(bundle);
                 return fisioFragment;
             case 2:
                 PsychologyFragment psychologyFragment = new PsychologyFragment();
-               // bundle.putSerializable(PATIENT, patient);
+                bundle.putSerializable(PATIENT, patient);
                 bundle.putSerializable(CLINIC_NAME, clinic_name);
                 bundle.putSerializable(PATIENT_NAME, patientName);
                 psychologyFragment.setArguments(bundle);

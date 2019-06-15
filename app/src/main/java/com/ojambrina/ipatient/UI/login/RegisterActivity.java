@@ -116,9 +116,6 @@ public class RegisterActivity extends AppCompatActivity {
     private Uri imageUri;
     private Uri getImageUri;
 
-    //TODO: Poner EditTextInputLayout en color blanco
-    //TODO: Crear checkbox politica de protección de datos
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -169,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             if (isValidName && isValidSurname && isValidIdentityNumber && isValidEmail && isValidPhone && isValidPassword && isValidPasswordRepeat) {
                 if (checkboxTermsConditions.isChecked()) {
-                    dialog = Utils.showProgressDialog(context, "Creando usuario");
+                    dialog = Utils.showProgressDialog(context, "Creando usuario", R.style.AppCompatAlertDialogStyle);
                     dialog.show();
 
                     if (imageUri != null) {
