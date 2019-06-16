@@ -124,6 +124,7 @@ public class FisioFragment extends Fragment {
             myLinearLayoutManager.setScrollEnabled(false);
             recyclerSession.setVisibility(View.GONE);
         } else {
+            layoutBackgroundTutorial.setVisibility(View.GONE);
             myLinearLayoutManager.setScrollEnabled(true);
             recyclerSession.setVisibility(View.VISIBLE);
         }

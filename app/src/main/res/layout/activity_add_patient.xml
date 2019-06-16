@@ -30,7 +30,6 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/patient_name"
                 android:singleLine="true" />
 
             <TextView
@@ -44,7 +43,6 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/patient_surname"
                 android:singleLine="true" />
 
             <TextView
@@ -59,7 +57,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="false"
-                android:hint="@string/patient_born_date"
                 android:singleLine="true" />
 
             <TextView
@@ -73,7 +70,6 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/phone"
                 android:inputType="phone"
                 android:singleLine="true" />
 
@@ -88,7 +84,6 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/email"
                 android:inputType="textEmailAddress"
                 android:singleLine="true" />
 
@@ -103,7 +98,6 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/patient_profession"
                 android:imeOptions="actionDone"
                 android:singleLine="true" />
 

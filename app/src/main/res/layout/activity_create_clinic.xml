@@ -29,9 +29,7 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/edit_clinic_name"
-                android:singleLine="true"
-                android:textColor="@android:color/white" />
+                android:singleLine="true" />
 
             <TextView
                 style="@style/AddClinicPatientTextView"
@@ -44,10 +42,8 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/clinic_password"
                 android:inputType="textPassword"
-                android:singleLine="true"
-                android:textColor="@android:color/white" />
+                android:singleLine="true" />
 
             <TextView
                 style="@style/AddClinicPatientTextView"
@@ -60,7 +56,7 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/edit_direction"
+                android:hint="@string/optional"
                 android:singleLine="true" />
 
             <TextView
@@ -74,7 +70,7 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/edit_cif"
+                android:hint="@string/optional"
                 android:singleLine="true" />
 
             <TextView
@@ -88,7 +84,7 @@
                 style="@style/AddClinicPatientEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/edit_description"
+                android:hint="@string/optional"
                 android:imeOptions="actionDone"
                 android:maxLines="4" />
 

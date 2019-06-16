@@ -15,50 +15,52 @@
         android:background="@drawable/ic_close"
         android:padding="8dp" />
 
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/layout_edit_clinic_name"
+    <TextView
+        android:id="@+id/text_clinic_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/image_close"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="18dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/clinic_name">
+        android:text="@string/clinic_name" />
 
-        <EditText
-            android:id="@+id/edit_clinic_name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:singleLine="true" />
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/layout_edit_password"
+    <EditText
+        android:id="@+id/edit_clinic_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/layout_edit_clinic_name"
-
+        android:layout_below="@id/text_clinic_name"
         android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:inputType="text"
+        android:singleLine="true" />
+
+    <TextView
+        android:id="@+id/text_clinic_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/edit_clinic_name"
+        android:layout_marginStart="18dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/password">
+        android:text="@string/password" />
 
-        <EditText
-            android:id="@+id/edit_clinic_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:imeOptions="actionDone"
-            android:inputType="textPassword"
-            android:singleLine="true" />
-    </android.support.design.widget.TextInputLayout>
+    <EditText
+        android:id="@+id/edit_clinic_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/text_clinic_password"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        android:singleLine="true" />
 
     <TextView
         android:id="@+id/text_send"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/layout_edit_password"
+        android:layout_below="@id/edit_clinic_password"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"

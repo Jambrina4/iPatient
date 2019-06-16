@@ -20,8 +20,8 @@
             android:weightSum="100">
 
             <TextView
-                android:layout_width="wrap_content"
                 style="@style/RegisterTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/name" />
 
@@ -31,7 +31,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/white"
-                android:hint="@string/name"
                 android:singleLine="true" />
 
             <TextView
@@ -46,13 +45,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/white"
-                android:hint="@string/surname"
                 android:singleLine="true"
                 android:textColor="@android:color/white" />
 
             <TextView
-                android:layout_width="wrap_content"
                 style="@style/RegisterTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/identityNumber" />
 
@@ -62,7 +60,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/white"
-                android:hint="@string/identityNumber"
                 android:singleLine="true" />
 
             <TextView
@@ -77,12 +74,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/white"
-                android:hint="@string/email"
                 android:inputType="textEmailAddress" />
 
             <TextView
-                android:layout_width="wrap_content"
                 style="@style/RegisterTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/phone" />
 
@@ -92,13 +88,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/white"
-                android:hint="@string/phone"
                 android:inputType="phone"
                 android:singleLine="true" />
 
             <TextView
-                android:layout_width="wrap_content"
                 style="@style/RegisterTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/password" />
 
@@ -108,13 +103,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/white"
-                android:hint="@string/password"
                 android:inputType="textPassword"
                 android:textColor="@android:color/white" />
 
             <TextView
-                android:layout_width="wrap_content"
                 style="@style/RegisterTextView"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/password_repeat" />
 
@@ -124,7 +118,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@android:color/white"
-                android:hint="@string/password_repeat"
                 android:imeOptions="actionDone"
                 android:inputType="textPassword" />
 

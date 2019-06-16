@@ -96,11 +96,13 @@
     <string name="patient_data">En estas dos primeras tarjetas se mostrarán los datos personales del paciente</string>
     <string name="patient_health">En estas tarjetas se mostrarán los datos referentes a la salud del paciente</string>
     <string name="patient_add_health_info">Mediante el botón “+” podrás añadir datos, así como eliminarlos con el botón “-”</string>
+    <string name="session_info">Aquí se mostrará una lista de sesiones de los pacientes, con la fecha de la sesión y los datos destacados de la misma en caso de tenerlos.</string>
     <string name="session_detail">Pulsando en la tarjeta se expandirá mostrando la información referente a la sesión, pulsando sobre el botón “+” se podrán añadir elementos y pulsando sobre el “-” se podrán eliminar, pulsando sobre &#9733; podremos añadirlos o eliminarlos de los datos destacados de la sesión</string>
-    <string name="session_info">Aquí se mostrará una lista de sesiones de los pacientes, en los que se verá la fecha que se ha realizado o se realizará la sesión, y en caso de tener datos destacados se mostrarán debajo de la fecha</string>
-    <string name="text_add_session">Pulsa este botón para añadir una nueva sesión del día actual, o haz una pulsación larga para mostrar un selector de fechas y añadir una sesión de la fecha deseada</string>
+    <string name="text_add_session">Pulsa brevemente para añadir una nueva sesión del día actual, o haz una pulsación larga para mostrar un selector de fechas y añadir una sesión de la fecha deseada</string>
     <string name="date">DD/MM/YYYY</string>
     <string name="text_cif">CIF</string>
     <string name="text_direction">Dirección</string>
     <string name="text_description">Descripción</string>
+    <string name="optional">(Opcional)</string>
+    <string name="insert_data">Introduzca datos</string>
 </resources>
