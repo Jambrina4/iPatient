@@ -232,7 +232,7 @@ public class HomeActivity extends AppCompatActivity {
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
-        toggle.getDrawerArrowDrawable().setColor(getResources().getColor(android.R.color.black));
+        toggle.getDrawerArrowDrawable().setColor(ContextCompat.getColor(context, android.R.color.black));
 
         clinicAdapter = new ClinicAdapter(context, connectedClinicList, sharedPreferences, (position, connectedClinic) -> {
             latestClinic = connectedClinicList.get(position).getName();
@@ -266,49 +266,46 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setClinicList() {
         fullName = professional.getName() + " " + professional.getSurname();
-        firebaseFirestore.collection(PROFESSIONALS).document(fullName).collection(CONNECTED_CLINIC_LIST).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("ERROR", "Listen failed.", e);
-                    return;
-                }
-                List<ConnectedClinic> list = queryDocumentSnapshots.toObjects(ConnectedClinic.class);
+        firebaseFirestore.collection(PROFESSIONALS).document(fullName).collection(CONNECTED_CLINIC_LIST).addSnapshotListener((queryDocumentSnapshots, e) -> {
+            if (e != null) {
+                Log.w("ERROR", "Listen failed.", e);
+                return;
+            }
+            List<ConnectedClinic> list = queryDocumentSnapshots.toObjects(ConnectedClinic.class);
 
-                if (!sharedPreferences.getBoolean(HOME_TUTORIAL, false)) {
-                    layoutBackgroundTutorial.setVisibility(View.VISIBLE);
-                    drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                    if (list.size() != 0) {
-                        connectedClinicList.clear();
-                        connectedClinicList.addAll(list);
-                        drawerTextNoData.setVisibility(View.GONE);
-                        progressBarDrawer.setVisibility(View.GONE);
-                        recyclerClinic.setVisibility(View.VISIBLE);
-                        clinicAdapter.setData(connectedClinicList);
-                        fab.show();
-                        homeTextNoData.setVisibility(View.GONE);
-                        progressBarPatients.setVisibility(View.GONE);
-                    } else {
-                        fab.hide();
-                        progressBarDrawer.setVisibility(View.GONE);
-                        drawerTextNoData.setVisibility(View.VISIBLE);
-                        homeTextNoData.setVisibility(View.GONE);
-                        progressBarPatients.setVisibility(View.GONE);
-                    }
+            if (!sharedPreferences.getBoolean(HOME_TUTORIAL, false)) {
+                layoutBackgroundTutorial.setVisibility(View.VISIBLE);
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                if (list.size() != 0) {
+                    connectedClinicList.clear();
+                    connectedClinicList.addAll(list);
+                    drawerTextNoData.setVisibility(View.GONE);
+                    progressBarDrawer.setVisibility(View.GONE);
+                    recyclerClinic.setVisibility(View.VISIBLE);
+                    clinicAdapter.setData(connectedClinicList);
+                    fab.show();
+                    homeTextNoData.setVisibility(View.GONE);
+                    progressBarPatients.setVisibility(View.GONE);
                 } else {
-                    if (list.size() != 0) {
-                        connectedClinicList.clear();
-                        connectedClinicList.addAll(list);
-                        drawerTextNoData.setVisibility(View.GONE);
-                        progressBarDrawer.setVisibility(View.GONE);
-                        recyclerClinic.setVisibility(View.VISIBLE);
-                        clinicAdapter.setData(connectedClinicList);
-                        fab.show();
-                    } else {
-                        fab.hide();
-                        progressBarDrawer.setVisibility(View.GONE);
-                        drawerTextNoData.setVisibility(View.VISIBLE);
-                    }
+                    fab.hide();
+                    progressBarDrawer.setVisibility(View.GONE);
+                    drawerTextNoData.setVisibility(View.VISIBLE);
+                    homeTextNoData.setVisibility(View.GONE);
+                    progressBarPatients.setVisibility(View.GONE);
+                }
+            } else {
+                if (list.size() != 0) {
+                    connectedClinicList.clear();
+                    connectedClinicList.addAll(list);
+                    drawerTextNoData.setVisibility(View.GONE);
+                    progressBarDrawer.setVisibility(View.GONE);
+                    recyclerClinic.setVisibility(View.VISIBLE);
+                    clinicAdapter.setData(connectedClinicList);
+                    fab.show();
+                } else {
+                    fab.hide();
+                    progressBarDrawer.setVisibility(View.GONE);
+                    drawerTextNoData.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -477,10 +474,16 @@ public class HomeActivity extends AppCompatActivity {
             if (patientList.size() == 0) {
                 homeTextNoData.setVisibility(View.VISIBLE);
                 recyclerPatients.setVisibility(View.GONE);
-                fab.hide();
+                fab.show();
             } else {
                 homeTextNoData.setVisibility(View.GONE);
                 recyclerPatients.setVisibility(View.VISIBLE);
+                fab.show();
+            }
+
+            if (toolbar.getTitle() == null) {
+                fab.hide();
+            } else {
                 fab.show();
             }
 

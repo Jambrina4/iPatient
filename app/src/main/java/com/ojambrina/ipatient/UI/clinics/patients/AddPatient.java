@@ -3,10 +3,8 @@ package com.ojambrina.ipatient.UI.clinics.patients;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -26,7 +24,6 @@ import android.util.Patterns;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,17 +31,12 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.ojambrina.ipatient.BuildConfig;
 import com.ojambrina.ipatient.R;
 import com.ojambrina.ipatient.entities.Patient;
@@ -62,7 +54,6 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.ojambrina.ipatient.utils.Constants.CLINICS;
 import static com.ojambrina.ipatient.utils.Constants.CLINIC_NAME;
-import static com.ojambrina.ipatient.utils.Constants.NO_CLINIC_ADDED;
 import static com.ojambrina.ipatient.utils.Constants.PATIENTS;
 import static com.ojambrina.ipatient.utils.RequestCodes.IMAGE_FROM_CAMERA;
 import static com.ojambrina.ipatient.utils.RequestCodes.IMAGE_FROM_GALLERY;
@@ -179,52 +170,47 @@ public class AddPatient extends AppCompatActivity {
                 dialog = Utils.showProgressDialog(context, "Añadiendo paciente", R.style.AppCompatAlertDialogStyle);
                 dialog.show();
 
-                if (clinic_name.equals(NO_CLINIC_ADDED)) {
-                    dialog.dismiss();
-                    Toast.makeText(context, "Debes registrar una clínica para poder agregar un paciente", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (imageUri != null) {
-                        StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
-                        sr.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
-                            Task<Uri> uri = sr.getDownloadUrl();
-                            do {
-                                Log.d("INFO", "SUBIENDO IMAGEN DE PACIENTE");
-                            } while (!uri.isComplete());
-                            getImageUri = uri.getResult();
+                if (imageUri != null) {
+                    StorageReference sr = storageReference.child(System.currentTimeMillis() + "." + getExtension(imageUri));
+                    sr.putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
+                        Task<Uri> uri = sr.getDownloadUrl();
+                        do {
+                            Log.d("INFO", "SUBIENDO IMAGEN DE PACIENTE");
+                        } while (!uri.isComplete());
+                        getImageUri = uri.getResult();
 
-                            firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).get().addOnCompleteListener(task -> {
-                                if (task.getResult().exists()) {
-                                    dialog.dismiss();
-                                    Toast.makeText(context, "Ya existe un paciente con ese nombre", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    dialog.dismiss();
-                                    addPatient();
-                                    firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).set(patient);
-                                    finish();
-                                }
-                            });
-                        }).addOnFailureListener(e -> {
-                            dialog.dismiss();
-                            Toast.makeText(context, "Ha ocurrido un problema al agregar el paciente, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
-                            Log.d("TAG", e.getMessage());
-                        });
-                    } else {
                         firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).get().addOnCompleteListener(task -> {
                             if (task.getResult().exists()) {
                                 dialog.dismiss();
                                 Toast.makeText(context, "Ya existe un paciente con ese nombre", Toast.LENGTH_SHORT).show();
                             } else {
+                                dialog.dismiss();
                                 addPatient();
                                 firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).set(patient);
-                                dialog.dismiss();
                                 finish();
                             }
-                        }).addOnFailureListener(e -> {
-                            dialog.dismiss();
-                            Toast.makeText(context, "Ha ocurrido un problema al agregar el paciente, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
-                            Log.d("TAG", e.getMessage());
                         });
-                    }
+                    }).addOnFailureListener(e -> {
+                        dialog.dismiss();
+                        Toast.makeText(context, "Ha ocurrido un problema al agregar el paciente, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", e.getMessage());
+                    });
+                } else {
+                    firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).get().addOnCompleteListener(task -> {
+                        if (task.getResult().exists()) {
+                            dialog.dismiss();
+                            Toast.makeText(context, "Ya existe un paciente con ese nombre", Toast.LENGTH_SHORT).show();
+                        } else {
+                            addPatient();
+                            firebaseFirestore.collection(CLINICS).document(clinic_name).collection(PATIENTS).document(name).set(patient);
+                            dialog.dismiss();
+                            finish();
+                        }
+                    }).addOnFailureListener(e -> {
+                        dialog.dismiss();
+                        Toast.makeText(context, "Ha ocurrido un problema al agregar el paciente, inténtalo de nuevo", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", e.getMessage());
+                    });
                 }
             }
         });
